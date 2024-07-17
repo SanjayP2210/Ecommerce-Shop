@@ -1,4 +1,3 @@
-import Navbar from "./components/Navbar/Navbar.jsx";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";

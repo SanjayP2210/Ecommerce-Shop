@@ -1,4 +1,4 @@
-import Logo from "../../assets/images/logos/logo.svg";
+import Logo from "../../assets/images/logos/Logo.png";
 import megaDDBG from "../../assets/images/backgrounds/mega-dd-bg.jpg";
 import iconFlagEn from "../../assets/images/flag/icon-flag-en.svg";
 import iconFlagCn from "../../assets/images/flag/icon-flag-cn.svg";
@@ -283,10 +283,11 @@ const Navbar = () => {
                     <Link
                       className="nav-link moon dark-layout nav-icon-hover-bg rounded-circle"
                       href="javascript:void(0)"
+                      style={{ padding: "0px" }}
                     >
                       <Icon
                         icon="solar:moon-line-duotone"
-                        className="moon fs-6"
+                        className={"moon fs-6"}
                       ></Icon>
                     </Link>
                     <Link
@@ -296,7 +297,7 @@ const Navbar = () => {
                     >
                       <Icon
                         icon="solar:sun-2-line-duotone"
-                        className="sun fs-6"
+                        className={"sun fs-6"}
                       ></Icon>
                     </Link>
                   </li>
@@ -856,7 +857,7 @@ const Navbar = () => {
               </li>
               <li className="nav-item d-none d-xl-flex align-items-center">
                 <Link to="/" className="text-nowrap nav-link">
-                  <img src={Logo} alt="matdash-img" />
+                  <img src={Logo} style={{ width: "50px" }} alt="matdash-img" />
                 </Link>
               </li>
               <li className="nav-item d-none d-xl-flex align-items-center nav-icon-hover-bg rounded-circle">
@@ -1060,7 +1061,7 @@ const Navbar = () => {
             </ul>
             <div className="d-block d-xl-none">
               <Link to="/" className="text-nowrap nav-link">
-                <img src={Logo} alt="matdash-img" />
+                <img src={Logo} style={{ width: "50px" }} alt="matdash-img" />
               </Link>
             </div>
             <Link
@@ -1101,10 +1102,11 @@ const Navbar = () => {
                     <Link
                       className="nav-link nav-icon-hover-bg rounded-circle moon dark-layout"
                       href="javascript:void(0)"
+                      style={{ padding: "0px" }}
                     >
                       <Icon
                         icon="solar:moon-line-duotone"
-                        className="moon fs-6"
+                        className={"moon fs-6"}
                       ></Icon>
                     </Link>
                     <Link
@@ -1114,7 +1116,7 @@ const Navbar = () => {
                     >
                       <Icon
                         icon="solar:sun-2-line-duotone"
-                        className="sun fs-6"
+                        className={"sun fs-6"}
                       ></Icon>
                     </Link>
                   </li>
@@ -1386,9 +1388,7 @@ const Navbar = () => {
                             alt="matdash-img"
                           />
                           <div>
-                            <h5 className="mb-0 fs-12">
-                              {user?.name}
-                            </h5>
+                            <h5 className="mb-0 fs-12">{user?.name}</h5>
                             <p className="mb-0 text-dark">{user?.email}</p>
                           </div>
                         </div>
@@ -1593,6 +1593,18 @@ const Navbar = () => {
                       <span className="hide-menu">Variant</span>
                     </Link>
                   </li>
+                  <li className="sidebar-item">
+                    <Link to="master/gender" className="sidebar-link">
+                      <i className="ti ti-list-check"></i>
+                      <span className="hide-menu">Gender</span>
+                    </Link>
+                  </li>
+                  <li className="sidebar-item">
+                    <Link to="master/category" className="sidebar-link">
+                      <i className="ti ti-list-check"></i>
+                      <span className="hide-menu">Category</span>
+                    </Link>
+                  </li>
                 </ul>
               </li>
               <li className="sidebar-item">
@@ -1620,6 +1632,12 @@ const Navbar = () => {
                     <Link to="/component/rating-star" className="sidebar-link">
                       <i className="ti ti-list-check"></i>
                       <span className="hide-menu">Rating Star</span>
+                    </Link>
+                  </li>
+                  <li className="sidebar-item">
+                    <Link to="/component/range-slider" className="sidebar-link">
+                      <i className="ti ti-list-check"></i>
+                      <span className="hide-menu">range-slider</span>
                     </Link>
                   </li>
                 </ul>

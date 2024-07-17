@@ -17,6 +17,7 @@ import categoryRouter from './router/categoryRoutes.js';
 import tagRouter from './router/tagRouter.js';
 import statusRouter from './router/statusRouter.js';
 import variantRouter from './router/variantRouter.js';
+import GenderRouter from './router/genderRouter.js';
 import errorMiddleware from './middleware/error.js';
 import connectDatabase from './config/db.js';
 
@@ -53,6 +54,7 @@ app.use('/api/category', categoryRouter);
 app.use('/api/tag', tagRouter);
 app.use('/api/status', statusRouter);
 app.use('/api/variant', variantRouter);
+app.use('/api/gender', GenderRouter);
 app.use(errorMiddleware);
 
 app.get("*", (req, res) => {

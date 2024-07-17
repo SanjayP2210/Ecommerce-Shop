@@ -13,7 +13,7 @@
 @import  '../css/tabler-icon.css';
 @import  '../css/toastr.css';
 @import  '../css/wizard.css';
-@import  '../css/range-slider.css';
+/* @import  '../css/range-slider.css'; */
 
 
 .spinner-border,
@@ -3609,13 +3609,9 @@ html[data-boxed-layout=boxed] .container-xxl {
 .matdash-lp-offcanvas .offcanvas-body .navbar-nav .nav-item .dropdown-toggle::after,
 .with-horizontal,
 [data-layout=vertical] .link-sidebar .nav-small-cap .mini-icon,
-body .circle-filled .noUi-handle:after,
-body .circle-filled .noUi-handle:before,
 body .connect-sorting .task-container-header .dropdown-toggle::after,
 body .edit-list,
 body .edit-tsk,
-body .noUi-handle:after,
-body .noUi-handle:before,
 body .scrumboard .task-header .dropdown .dropdown-toggle::after {
     display: none
 }
@@ -16458,7 +16454,8 @@ svg {
 
 body .circle-filled .noUi-handle {
     background: var(--bs-primary);
-    border-radius: 50%
+    border-radius: 50%;
+    cursor:pointer
 }
 
 body .noUi-handle {
@@ -16472,25 +16469,24 @@ body .noUi-target {
     background-color: var(--bs-gray-100);
     border: none;
     box-shadow: none;
-    border-radius: 1rem
+    border-radius: 1rem;
+    cursor:pointer
 }
 
 body .noUi-horizontal {
     height: 10px;
-    padding-right: 17px
 }
 
-body .noUi-horizontal .noUi-handle {
+ body .noUi-horizontal .noUi-handle {
     width: 20px;
     height: 20px;
     top: -5px;
-    left: -1px
 }
 
-body .noUi-horizontal .noUi-origin {
+/*body .noUi-horizontal .noUi-origin {
     left: 17px;
     right: -17px
-}
+} */
 
 body .noUi-horizontal.slider-xl {
     height: 14px
@@ -16535,6 +16531,7 @@ body .square .noUi-handle {
 }
 
 body .noUi-vertical.square .noUi-handle:before {
+    content:"" !important;
     display: block;
     width: 12px;
     height: 2px;
@@ -16543,6 +16540,7 @@ body .noUi-vertical.square .noUi-handle:before {
 }
 
 body .noUi-vertical.square .noUi-handle:after {
+    content:"" !important;
     display: block;
     width: 12px;
     height: 2px;
@@ -17637,4 +17635,8 @@ h6 {
 
 .sortable-table th{
     cursor: pointer;
+}
+
+.range-slider{
+    margin:20px 0px;
 }

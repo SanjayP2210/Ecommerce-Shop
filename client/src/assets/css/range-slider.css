@@ -1,4 +1,4 @@
-input[type=range].range-slider {
+/* input[type=range].range-slider {
   -webkit-appearance: none;
   display: block;
   width: 100%;
@@ -424,4 +424,4 @@ input[type=range].range-slider::-ms-tooltip {
     margin-top: -10px;
     color: black;
       font-weight: 500;
-}
+} */

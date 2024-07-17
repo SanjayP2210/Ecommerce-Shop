@@ -9,6 +9,7 @@ import Editor from "../../components/Editor/BootsrapEditor";
 import Loader from "../../components/Loader/Loader";
 import ReactEditor from "../../components/Editor/TextEditor";
 import ReviewCard from "../../components/ReviewCard/ReviewCard";
+import { handleNumberValidation } from "../../constants/utilities.js";
 
 const EditProduct = () => {
    const { id } = useParams();
@@ -40,27 +41,27 @@ const EditProduct = () => {
   console.log("uploadedThumbnails", uploadedThumbnails);
   console.log('data', data);
   
-   useEffect(() => {
-     async function fetchProduct() {
-       try {
-         setIsLoading(true);
-         const response = await apiService.getRequest(`product/${id}`);
-         setData(response.productData);
-         const productData = response.productData;
-          setDescription(productData?.description);
-          setUploadedImages(productData?.images);
-         setUploadedThumbnails(productData?.thumbnail);
-         const variants = productData?.variants?.map((x) => {
-           return { ...x, id: x._id };
-         });
-         console.log('variants',variants);
-         setVariantData(variants);
-         setIsLoading(false);
-       } catch (error) {
-         setIsLoading(false);
-          console.error(error);
-       }
+   const fetchProduct= async()=> {
+     try {
+       setIsLoading(true);
+       const response = await apiService.getRequest(`product/${id}`);
+       setData(response.productData);
+       const productData = response.productData;
+       setDescription(productData?.description);
+       setUploadedImages(productData?.images);
+       setUploadedThumbnails(productData?.thumbnail);
+       const variants = productData?.variants?.map((x) => {
+         return { ...x, id: x._id };
+       });
+       console.log("variants", variants);
+       setVariantData(variants);
+       setIsLoading(false);
+     } catch (error) {
+       setIsLoading(false);
+       console.error(error);
      }
+   }
+   useEffect(() => {
      fetchProduct();
    }, [id]);
 
@@ -82,7 +83,9 @@ const EditProduct = () => {
        description,
        images: uploadedImages,
        thumbnail: uploadedThumbnails,
-       variants: data?.variants?.map(({ id, ...rest }) => rest),
+       variants: data?.variants?.map(({ id, ...rest }) => {
+         return { value: rest.variantValue, label: rest.variantType?.value };
+       }),
      };
      const formData = new FormData();
      const formKeys = Object.keys(updatedData);
@@ -239,7 +242,10 @@ const EditProduct = () => {
                           value={data?.basePrice}
                           name="basePrice"
                           placeholder="Base Price"
-                          onChange={handleInput}
+                          onChange={(e) => {
+                            e = handleNumberValidation(e);
+                            handleInput(e);
+                          }}
                         />
                         <p className="fs-2">Set the product price.</p>
                       </div>
@@ -248,14 +254,17 @@ const EditProduct = () => {
                           Stock <span className="text-danger">*</span>
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           className="form-control"
                           value={data?.stock}
                           name="stock"
-                          placeholder="Stock"
+                          placeholder="000"
                           min={0}
-                          maxLength={4}
-                          onChange={handleInput}
+                          maxLength={3}
+                          onChange={(e) => {
+                            e = handleNumberValidation(e);
+                            handleInput(e);
+                          }}
                         />
                       </div>
                     </div>
@@ -421,7 +430,10 @@ const EditProduct = () => {
                             name="vatAmount"
                             className="form-control"
                             value={data?.vatAmount}
-                            onChange={handleInput}
+                            onChange={(e) => {
+                              e = handleNumberValidation(e);
+                              handleInput(e);
+                            }}
                           />
                           <p className="fs-2">Set the product VAT about.</p>
                         </div>

@@ -8,6 +8,8 @@ import { RangeSlider } from "../../components/RangeSlider/RangeSlider";
 import AddCategory from "../AddCategory";
 import AddVariants from "../AddVariants";
 import { NavLink } from "react-router-dom";
+import { handleNumberValidation } from "../../constants/utilities.js";
+
 const AddProduct = () => {
   const [data, setData] = useState({
     productName: "",
@@ -23,7 +25,8 @@ const AddProduct = () => {
     thumbnail: [],
     images: [],
     discountType: "no_discount",
-    stock:0
+    stock:0,
+    gender:""
   });
   console.log("data", data);
   const [description, setDescription] = useState("");
@@ -32,9 +35,14 @@ const AddProduct = () => {
   const [variantData, setVariantData] = useState([
     { id: Date.now(), variantValue: "", variantType: "" },
   ]);
-  console.log("variantData", variantData);
+  console.log(
+    "variantData",
+    variantData?.map(({ id, ...rest }) => {
+      return { value: rest.variantValue, label: rest.variantType?.value };
+    })
+  );
   const [selectedOption, setSelectedOption] = useState("no_discount");
-  const [rangeValue, setRangeValue] = useState(50);
+  const [rangeValue, setRangeValue] = useState([50]);
   const [categories, setCategories] = useState([
     { value: "computer", label: "Computer" },
     { value: "watches", label: "Watches" },
@@ -57,6 +65,7 @@ const AddProduct = () => {
     { value: "fashion", label: "Fashion" },
     { value: "footwear", label: "Footwear" },
   ]);
+  const [genderList, setGenderList] = useState([]);
   const [newCategories, setNewCategories] = useState([]);
   const rangeRef = useRef(null);
   const categoryCloseBtnRef = useRef(null);
@@ -76,10 +85,10 @@ const AddProduct = () => {
     try {
       const response = await apiService.getRequest("category");
       if (response) {
-        const filteredCategories = response?.categories?.map(category => {
+        const filteredCategories = response?.category?.map((cat) => {
           return {
-            value: category?.name,
-            label: category?.name,
+            value: cat?.name,
+            label: cat?.name,
           };
         });
         console.log("filteredCategories", filteredCategories);
@@ -124,10 +133,28 @@ const AddProduct = () => {
         setTagList(filteredTags);
       }
     } catch (error) {
-      toast.error("error while fetching category", error);
+      toast.error("error while fetching tags", error);
       console.log("error", error);
     }
   };
+
+  const fetchGender = async () => {
+    try {
+      const response = await apiService.getRequest("gender");
+      if (response) {
+        const filteredGender = response?.gender?.map((data) => {
+          return {
+            value: data?.name,
+            label: data?.name,
+          };
+        });
+        setGenderList(filteredGender);
+      }
+    } catch (error) {
+      toast.error("error while fetching gender", error);
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,7 +164,9 @@ const AddProduct = () => {
         description,
         images: uploadedImages,
         thumbnail: uploadedThumbnails,
-        variants: variantData?.map(({ id, ...rest }) => rest),
+        variants: variantData?.map(({ id, ...rest }) => {
+           return { value: rest.variantValue, label: rest.variantType?.value }
+        }),
         discountType: selectedOption,
       };
       const formData = new FormData();
@@ -208,6 +237,7 @@ const AddProduct = () => {
     fetchCategories();
     fetchTags();
     fetchStatus();
+    fetchGender();
   }, [])
 
   return (
@@ -222,7 +252,7 @@ const AddProduct = () => {
                   <li className="breadcrumb-item d-flex align-items-center">
                     <NavLink
                       className="text-muted text-decoration-none d-flex"
-                      to={'/'}
+                      to={"/"}
                     >
                       <i className="ti ti-home-2 fs-6"></i>
                     </NavLink>
@@ -330,8 +360,12 @@ const AddProduct = () => {
                         className="form-control"
                         value={data?.basePrice}
                         name="basePrice"
-                        placeholder="Base Price"
-                        onChange={handleInput}
+                        placeholder="00000"
+                        maxLength={5}
+                        onChange={(e) => {
+                          e = handleNumberValidation(e);
+                          handleInput(e);
+                        }}
                       />
                       <p className="fs-2">Set the product price.</p>
                     </div>
@@ -340,14 +374,17 @@ const AddProduct = () => {
                         Stock <span className="text-danger">*</span>
                       </label>
                       <input
-                        type="number"
+                        type="text"
                         className="form-control"
                         value={data?.stock}
                         name="stock"
-                        placeholder="Stock"
+                        placeholder="000"
                         min={0}
-                        maxLength={4}
-                        onChange={handleInput}
+                        maxLength={3}
+                        onChange={(e) => {
+                          e = handleNumberValidation(e);
+                          handleInput(e);
+                        }}
                       />
                     </div>
                   </div>
@@ -440,14 +477,14 @@ const AddProduct = () => {
                               Set Discount Percentage{" "}
                               <span className="text-danger">*</span>
                             </label>
-                            <div>
+                            <div style={{ marging: "30px 10px" }}>
                               <RangeSlider
                                 rangeRef={rangeRef}
                                 rangeValue={rangeValue}
                                 setRangeValue={setRangeValue}
                                 id={"rangeValue"}
-                                min={"0"}
-                                max={"50"}
+                                min={0}
+                                max={100}
                               />
                             </div>
                             <br />
@@ -516,7 +553,10 @@ const AddProduct = () => {
                           name="vatAmount"
                           className="form-control"
                           value={data?.vatAmount}
-                          onChange={handleInput}
+                          onChange={(e) => {
+                            e = handleNumberValidation(e);
+                            handleInput(e);
+                          }}
                         />
                         <p className="fs-2">Set the product VAT about.</p>
                       </div>
@@ -594,6 +634,28 @@ const AddProduct = () => {
               </div>
               <div className="card">
                 <div className="card-body">
+                  <div className="d-flex align-items-center justify-content-between mb-7">
+                    <h4 className="card-title">Gender</h4>
+                  </div>
+                    <div>
+                      <Select2
+                        className="form-select mr-sm-2  mb-2"
+                        id="inlineFormCustomSelect"
+                        options={genderList || []}
+                        isMultiple={true}
+                        handleOnChange={(value) => {
+                          setData({
+                            ...data,
+                            gender: value,
+                          });
+                        }}
+                      />
+                      <p className="fs-2 mb-0">Set the Gender</p>
+                    </div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body">
                   <h4 className="card-title mb-7">Product Details</h4>
                   <div className="mb-3">
                     <label className="form-label">Categories</label>
@@ -642,7 +704,7 @@ const AddProduct = () => {
                   </div>
                 </div>
               </div>
-              <div className="card">
+              {/* <div className="card">
                 <div className="card-body">
                   <h4 className="card-title mb-7">Product Template</h4>
                   <form action="" className="form-horizontal">
@@ -683,7 +745,7 @@ const AddProduct = () => {
                     </div>
                   </form>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

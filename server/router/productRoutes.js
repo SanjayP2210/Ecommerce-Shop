@@ -1,16 +1,18 @@
 import express from 'express';
-import { addProduct, updateProduct, deleteProduct, getProductById, getProducts, createProductReview, deleteReview, getProductReviews } from '../controller/productController.js';
+import { addProduct, updateProduct, deleteProduct, getProductById, getProducts, createProductReview, deleteReview, getProductReviews, filterByCategory, getProductForShop } from '../controller/productController.js';
 import Product from '../models/Product.js';
 const router = express.Router();
 
 router.get('/', getProducts)
 router.post('/', addProduct);
+router.get('/shop', getProductForShop);
 router.get('/:id', getProductById);
 router.put('/review', createProductReview);
 router.get('/review', getProductReviews);
 router.delete('/review', deleteReview);
 router.put('/:id', getProduct, updateProduct);
 router.delete('/:id', getProduct, deleteProduct);
+router.get('/category/:value', filterByCategory);
 
 async function getProduct(req, res, next) {
     let product;

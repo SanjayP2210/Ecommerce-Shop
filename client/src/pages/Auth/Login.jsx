@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
-import Logo from "../../assets/images/logos/logo.svg";
+import Logo from "../../assets/images/logos/Logo.png";
 import FBIcon from "../../assets/images/svgs/facebook-icon.svg";
 import GoogleIcon from "../../assets/images/svgs/google-icon.svg";
-import LoginSlider from "../../assets/images/backgrounds/login-side.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getJWTToken } from "../../constants/utilities";
+import { getJWTToken, handleNumberValidation } from "../../constants/utilities";
 import { toast } from "react-toastify";
 import { loginUser, createUser } from "../../reducers/authReducer";
-import DropzoneComponent from "../../components/DropZone/DropZone";
 import UploadImage from "../../components/UploadImage/UploadImage";
 import Loader from "../../components/Loader/Loader";
-import apiService from "../../service/apiService";
+import { FormProvider, useForm } from "react-hook-form";
+import InputBox from "../../components/InputBox/InputBox";
+import LoginSecondSection from "./LoginSecondSection";
 
 const Login = () => {
+  const methods = useForm({
+    reValidateMode: "onBlur",
+  });
+  const { handleSubmit,clearErrors,reset,getValues,setError ,watch} = methods;
   const { pageName } = useParams();
   const [isLoginFlow, setIsLoginFlow] = useState(true);
   const navigate = useNavigate();
@@ -21,28 +25,28 @@ const Login = () => {
   const token = getJWTToken();
   const [image, setImage] = useState([]);
   const [isPassType, setIsPassType] = useState(true);
+  const mobileRef = useRef(null);
   const { isLoggedIn, loginUserData, loading, error, isUserAdded } =
     useSelector((state) => state.auth);
 
-  const [user, setUser] = useState({
-      email: "",
-      password: "",
-  });
+  // useEffect(() => {
+  // }, [getValues]);
 
   useEffect(() => {
     if (pageName) {
       const isLogin = pageName === "login";
       setIsLoginFlow(isLogin);
       if (!isLogin) {
-        setUser({
-          ...user,
-          name: "",
-          mobileNumber: "",
-          image: [],
-        });
+        // setUser({
+        //   ...user,
+        //   name: "",
+        //   mobileNumber: "",
+        //   image: [],
+        // });
       }
+      clearErrors();
     }
-  }, [pageName]);
+  }, [pageName,clearErrors]);
 
   useEffect(() => {
     if (!loading && isLoggedIn && loginUserData && token) {
@@ -50,55 +54,53 @@ const Login = () => {
       resetForm();
       navigate("/");
     }
-  }, [loginUserData, token]);
+  }, [loginUserData, token, isLoggedIn, loading]);
 
   useEffect(() => {
     if (!loading && isUserAdded) {
       resetForm();
       navigate("/auth/login");
     }
-  }, [isUserAdded,loading]);
+  }, [isUserAdded, loading]);
 
-  const handleInput = (e) => {
-    const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
+  // const handleInput = (e) => {
+  //   const { name, value } = e.target;
+  //   setUser({
+  //     ...user,
+  //     [name]: value,
+  //   });
+  // };
+
+  const resetForm = () => {
+    // setUser({
+    //   email: "",
+    //   password: "",
+    //   mobileNumber: "",
+    //   name: "",
+    //   image: [],
+    // });
+    clearErrors();
+    reset();
+    setImage([]);
   };
 
-  const resetForm = () => { 
-    setUser({
-      email: "",
-      password: "",
-      mobileNumber: "",
-      name: "",
-      image: [],
-    });
-    setImage([]);
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     try {
-      const { email, password, name, mobileNumber } = user;
-      if ((isLoginFlow && !email) || !password) {
-        toast.error("please fill all the fields");
-        return;
-      }
-      if (!isLoginFlow && (!email || !password || !name || !mobileNumber)) {
-        toast.error("please fill all the fields");
+      console.log("data", data);
+      const { mobileNumber } = data;
+      if (!isLoginFlow && image?.length === 0) {
+        toast.error("upload profile picture");
         return;
       }
       const formData = new FormData();
-      const formKeys = Object.keys(user);
+      const formKeys = Object.keys(data);
       formKeys.forEach((key) => {
-        const keyValue =
-          key === "image" && !isLoginFlow
-            ? JSON.stringify(image)
-            : user[key];
+        const keyValue = data[key];
         formData.append(key, keyValue);
       });
+      if (!isLoginFlow) {
+        formData.append("image", JSON.stringify(image));
+      }
       dispatch(isLoginFlow ? loginUser(formData) : createUser(formData));
     } catch (error) {
       toast.error(error.message);
@@ -119,16 +121,16 @@ const Login = () => {
                       <div className="row justify-content-center py-4">
                         <div className="col-lg-11">
                           <div className="card-body">
-                            <a
-                              href="../main/index.html"
-                              className="text-nowrap logo-img d-block mb-4 w-100"
+                            <NavLink
+                              to="/"
+                              className="text-nowrap logo-img d-block mb-4 w-100 text-center"
                             >
                               <img
                                 src={Logo}
                                 className="dark-logo"
                                 alt="Logo-Dark"
                               />
-                            </a>
+                            </NavLink>
                             <h2 className="lh-base mb-4">
                               Let`s get you signed in
                             </h2>
@@ -172,308 +174,177 @@ const Login = () => {
                               </p>
                               <span className="border-top w-100 position-absolute top-50 start-50 translate-middle"></span>
                             </div>
-                            <form onSubmit={handleSubmit}>
-                              {!isLoginFlow && (
-                                <>
-                                  <div className="mb-3">
-                                    <label
-                                      htmlFor="text-name"
-                                      className="form-label"
-                                    >
-                                      Name
-                                    </label>
-                                    <div className="input-group border rounded-1">
-                                      <span
-                                        className="input-group-text bg-transparent px-6 border-0"
-                                        id="basic-addon1"
-                                      >
-                                        <i className="ti ti-user fs-6"></i>
-                                      </span>
-                                      <input
-                                        type="text"
+                            <FormProvider {...methods}>
+                              <form onSubmit={handleSubmit(onSubmit)}>
+                                {!isLoginFlow && (
+                                  <>
+                                    <div className="mb-3">
+                                      <InputBox
+                                        label={"Name"}
                                         className="form-control border-0 ps-2"
                                         id="name"
-                                        placeholder="Enter your name"
                                         name="name"
-                                        required
-                                        autoComplete="off"
-                                        value={user.name}
-                                        onChange={handleInput}
+                                        validation={{
+                                          required: "Name is required",
+                                        }}
+                                        inputGroupProps={{
+                                          iconClassName: "ti ti-user fs-6",
+                                        }}
                                       />
                                     </div>
-                                  </div>
-                                  <div className="mb-3">
+                                    <div className="mb-3">
+                                      <InputBox
+                                        // type={"text"}
+                                        name="mobileNumber"
+                                        label={"Mobile Number"}
+                                        className="form-control border-0 ps-2"
+                                        ref={mobileRef}
+                                        inputGroupProps={{
+                                          iconClassName: "ti ti-phone fs-6",
+                                        }}
+                                        validation={{
+                                          pattern: {
+                                            value: /^[0-9]*$/,
+                                            message:
+                                              "Please enter only numbers",
+                                          },
+                                          required: "Mobile Number is required",
+                                          minLength: {
+                                            value: 10,
+                                            message:
+                                              "Please enter valid 10 digit mobile number",
+                                          },
+                                          maxLength: {
+                                            value: 10,
+                                            message: "Only 10 Digits Allowed",
+                                          },
+                                        }}
+                                        onChange={(e) => {
+                                          e = handleNumberValidation(e);
+                                        }}
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                                <div className="mb-3">
+                                  <InputBox
+                                    label={"Email Address"}
+                                    className="form-control border-0 ps-2 email-inputmask"
+                                    name="email"
+                                    id="email-mask"
+                                    inputGroupProps={{
+                                      iconClassName: "ti ti-mail fs-6",
+                                    }}
+                                    validation={{
+                                      required: "Email is required",
+                                      pattern: {
+                                        value:
+                                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                                        message: "Enter a valid email address",
+                                      },
+                                    }}
+                                  />
+                                </div>
+                                <div className="mb-4">
+                                  <div className="d-flex align-items-center justify-content-between">
                                     <label
-                                      htmlFor="text-number"
+                                      htmlFor="password"
                                       className="form-label"
                                     >
-                                      Mobile Number
+                                      Password
                                     </label>
-                                    <div className="input-group border rounded-1">
-                                      <span
-                                        className="input-group-text bg-transparent px-6 border-0"
-                                        id="basic-addon1"
+                                    <NavLink
+                                      to="/auth/forget-password"
+                                      className="text-primary link-dark fs-2"
+                                    >
+                                      Forgot Password ?
+                                    </NavLink>
+                                  </div>
+                                  <InputBox
+                                    type={isPassType ? "password" : "text"}
+                                    className="form-control border-0 ps-2"
+                                    name="password"
+                                    validation={{
+                                      required: "Password is required",
+                                    }}
+                                    inputGroupProps={{
+                                      iconClassName: `${
+                                        isPassType
+                                          ? "ti ti-eye-off fs-6"
+                                          : "ti ti-eye fs-6"
+                                      }`,
+                                      iconClick: () => {
+                                        setIsPassType(!isPassType);
+                                      },
+                                    }}
+                                  />
+                                </div>
+                                {!isLoginFlow && (
+                                  <div className="mb-4">
+                                    <div className="d-flex align-items-center justify-content-between">
+                                      <label
+                                        htmlFor="exampleInputEmail1"
+                                        className="form-label"
                                       >
-                                        <i className="ti ti-phone fs-6"></i>
-                                      </span>
-                                      <input
-                                        type="number"
-                                        name="mobileNumber"
-                                        placeholder="9999999999"
-                                        className="form-control border-0 ps-2"
-                                        id="mobileNumber"
-                                        required
-                                        autoComplete="off"
-                                        value={user.mobileNumber}
-                                        maxLength={10}
-                                        onChange={handleInput}
-                                        min={0}
+                                        Profile Picture
+                                      </label>
+                                      <UploadImage
+                                        multiple={false}
+                                        setImage={setImage}
+                                        data={image}
                                       />
                                     </div>
                                   </div>
-                                </>
-                              )}
-                              <div className="mb-3">
-                                <label
-                                  htmlFor="exampleInputEmail1"
-                                  className="form-label"
-                                >
-                                  Email Address
-                                </label>
-                                <div className="input-group border rounded-1">
-                                  <span
-                                    className="input-group-text bg-transparent px-6 border-0"
-                                    id="basic-addon1"
-                                  >
-                                    <i className="ti ti-mail fs-6"></i>
-                                  </span>
-                                  <input
-                                    type="email"
-                                    className="form-control border-0 ps-2"
-                                    placeholder="Enter your email"
-                                    aria-describedby="emailHelp"
-                                    name="email"
-                                    id="email"
-                                    required
-                                    autoComplete="off"
-                                    value={user.email}
-                                    onChange={handleInput}
-                                  />
+                                )}
+                                <div className="d-flex align-items-center justify-content-between mb-4">
+                                  <div className="form-check">
+                                    <input
+                                      className="form-check-input primary"
+                                      type="checkbox"
+                                      value=""
+                                      id="flexCheckChecked"
+                                      checked
+                                    />
+                                    <label
+                                      className="form-check-label text-dark"
+                                      htmlFor="flexCheckChecked"
+                                    >
+                                      Keep me logged in
+                                    </label>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="mb-4">
-                                <div className="d-flex align-items-center justify-content-between">
-                                  <label
-                                    htmlFor="password"
-                                    className="form-label"
-                                  >
-                                    Password
-                                  </label>
+                                <button
+                                  className="btn btn-dark w-100 py-8 mb-4 rounded-1"
+                                  type="submit"
+                                >
+                                  {!isLoginFlow ? "Sign Up" : "Sing In"}
+                                </button>
+                                <div className="d-flex align-items-center">
+                                  <p className="fs-12 mb-0 fw-medium">
+                                    Don’t have an account yet?
+                                  </p>
                                   <NavLink
-                                    to="/auth/forget-password"
-                                    className="text-primary link-dark fs-2"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setIsLoginFlow(!isLoginFlow);
+                                      navigate(
+                                        isLoginFlow
+                                          ? "/auth/register"
+                                          : "/auth/login"
+                                      );
+                                    }}
+                                    className="text-primary fw-bolder ms-2"
                                   >
-                                    Forgot Password ?
+                                    {isLoginFlow ? "Sign Up" : "Sing In"} Now
                                   </NavLink>
                                 </div>
-                                <div className="input-group border rounded-1">
-                                  <span
-                                    className="input-group-text bg-transparent px-6 border-0"
-                                    id="basic-addon1"
-                                    onClick={(e) => {
-                                      setIsPassType(!isPassType);
-                                    }}
-                                  >
-                                    {isPassType ? (
-                                      <i className="ti ti-eye fs-6"></i>
-                                    ) : (
-                                      <i className="ti ti-eye-off fs-6"></i>
-                                    )}
-                                  </span>
-                                  <input
-                                    type={isPassType ? "password" : "text"}
-                                    className="form-control border-0 ps-2"
-                                    placeholder="Enter your password"
-                                    required
-                                    name="password"
-                                    autoComplete="off"
-                                    value={user.password}
-                                    onChange={handleInput}
-                                  />
-                                </div>
-                              </div>
-                              {!isLoginFlow &&
-                              <div className="mb-4">
-                                <div className="d-flex align-items-center justify-content-between">
-                                  <label
-                                    htmlFor="exampleInputEmail1"
-                                    className="form-label"
-                                  >
-                                    Profile Picture
-                                  </label>
-                                  <UploadImage
-                                    multiple={false}
-                                    setImage={setImage}
-                                    data={user?.image}
-                                  />
-                                </div>
-                              </div>
-                              }
-                              <div className="d-flex align-items-center justify-content-between mb-4">
-                                <div className="form-check">
-                                  <input
-                                    className="form-check-input primary"
-                                    type="checkbox"
-                                    value=""
-                                    id="flexCheckChecked"
-                                    checked
-                                  />
-                                  <label
-                                    className="form-check-label text-dark"
-                                    htmlFor="flexCheckChecked"
-                                  >
-                                    Keep me logged in
-                                  </label>
-                                </div>
-                              </div>
-                              <button
-                                className="btn btn-dark w-100 py-8 mb-4 rounded-1"
-                                type="submit"
-                              >
-                                {!isLoginFlow ? "Sign Up" : "Sing In"}
-                              </button>
-                              <div className="d-flex align-items-center">
-                                <p className="fs-12 mb-0 fw-medium">
-                                  Don’t have an account yet?
-                                </p>
-                                <NavLink
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    setIsLoginFlow(!isLoginFlow);
-                                    navigate(
-                                      isLoginFlow
-                                        ? "/auth/register"
-                                        : "/auth/login"
-                                    );
-                                  }}
-                                  className="text-primary fw-bolder ms-2"
-                                >
-                                  {isLoginFlow ? "Sign Up" : "Sing In"} Now
-                                </NavLink>
-                              </div>
-                            </form>
+                              </form>
+                            </FormProvider>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-xl-6 d-none d-xl-block">
-                      <div className="row justify-content-center align-items-start h-100">
-                        <div className="col-lg-9">
-                          <div
-                            id="auth-login"
-                            className="carousel slide auth-carousel mt-5 pt-4"
-                            data-bs-ride="carousel"
-                          >
-                            <div className="carousel-indicators">
-                              <button
-                                type="button"
-                                data-bs-target="#auth-login"
-                                data-bs-slide-to="0"
-                                className="active"
-                                aria-current="true"
-                                aria-label="Slide 1"
-                              ></button>
-                              <button
-                                type="button"
-                                data-bs-target="#auth-login"
-                                data-bs-slide-to="1"
-                                aria-label="Slide 2"
-                              ></button>
-                              <button
-                                type="button"
-                                data-bs-target="#auth-login"
-                                data-bs-slide-to="2"
-                                aria-label="Slide 3"
-                              ></button>
-                            </div>
-                            <div className="carousel-inner">
-                              <div className="carousel-item active">
-                                <div className="d-flex align-items-center justify-content-center w-100 h-100 flex-column gap-9 text-center">
-                                  <img
-                                    src={LoginSlider}
-                                    alt="login-side-img"
-                                    width="300"
-                                    className="img-fluid"
-                                  />
-                                  <h4 className="mb-0">
-                                    Feature Rich 3D Charts
-                                  </h4>
-                                  <p className="fs-12 mb-0">
-                                    Donec justo tortor, malesuada vitae faucibus
-                                    ac, tristique sit amet massa. Aliquam
-                                    dignissim nec felis quis imperdiet.
-                                  </p>
-                                  <a
-                                    href="javascript:void(0)"
-                                    className="btn btn-primary rounded-1"
-                                  >
-                                    Learn More
-                                  </a>
-                                </div>
-                              </div>
-                              <div className="carousel-item">
-                                <div className="d-flex align-items-center justify-content-center w-100 h-100 flex-column gap-9 text-center">
-                                  <img
-                                    src={LoginSlider}
-                                    alt="login-side-img"
-                                    width="300"
-                                    className="img-fluid"
-                                  />
-                                  <h4 className="mb-0">
-                                    Feature Rich 2D Charts
-                                  </h4>
-                                  <p className="fs-12 mb-0">
-                                    Donec justo tortor, malesuada vitae faucibus
-                                    ac, tristique sit amet massa. Aliquam
-                                    dignissim nec felis quis imperdiet.
-                                  </p>
-                                  <a
-                                    href="javascript:void(0)"
-                                    className="btn btn-primary rounded-1"
-                                  >
-                                    Learn More
-                                  </a>
-                                </div>
-                              </div>
-                              <div className="carousel-item">
-                                <div className="d-flex align-items-center justify-content-center w-100 h-100 flex-column gap-9 text-center">
-                                  <img
-                                    src={LoginSlider}
-                                    alt="login-side-img"
-                                    width="300"
-                                    className="img-fluid"
-                                  />
-                                  <h4 className="mb-0">
-                                    Feature Rich 1D Charts
-                                  </h4>
-                                  <p className="fs-12 mb-0">
-                                    Donec justo tortor, malesuada vitae faucibus
-                                    ac, tristique sit amet massa. Aliquam
-                                    dignissim nec felis quis imperdiet.
-                                  </p>
-                                  <a
-                                    href="javascript:void(0)"
-                                    className="btn btn-primary rounded-1"
-                                  >
-                                    Learn More
-                                  </a>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <LoginSecondSection />
                   </div>
                 </div>
               </div>

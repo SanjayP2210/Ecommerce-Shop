@@ -1,4 +1,4 @@
-import Logo from "../../assets/images/logos/logo.svg";
+import Logo from "../../assets/images/logos/Logo.png";
 import megaDDBG from "../../assets/images/backgrounds/mega-dd-bg.jpg";
 import iconFlagEn from "../../assets/images/flag/icon-flag-en.svg";
 import iconFlagCn from "../../assets/images/flag/icon-flag-cn.svg";

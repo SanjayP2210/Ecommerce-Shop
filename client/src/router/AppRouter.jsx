@@ -12,10 +12,11 @@ import ForgetPassword from "../pages/Auth/ForgetPassword.jsx";
 import ResetPassword from "../pages/ResetPassword.jsx";
 import Login from "../pages/Auth/Login.jsx";
 import Logout from "../pages/Logout.jsx";
-import MasterForm from "../pages/CommonFormComponent/MasterForm.jsx";
+import MasterForm from "../pages/MasterForm/MasterForm.jsx";
 import OwlCarouselComponent from "../components/OwlCarousel/OwlCarousel.jsx";
 import RatingComponent from "../components/Rating/RatingComponent.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
+import { RangeSlider } from "../components/RangeSlider/RangeSlider.jsx";
 
 const AppRouter = () => {
   return (
@@ -44,6 +45,7 @@ const AppRouter = () => {
           <Route path="component">
             <Route path="image-viewer" element={<OwlCarouselComponent />} />
             <Route path="rating-star" element={<RatingComponent />} />
+            <Route path="range-slider" element={<RangeSlider />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" />} />

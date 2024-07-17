@@ -1,11 +1,8 @@
 import { Schema, model } from 'mongoose';
 
-const CategorySchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
+const Gender = Schema({
+    name: { type: String, required: true,unique: true },
+    isActive: { type: Boolean, required: true, default: true },
     createdAt: {
         type: Date,
         default: Date.now()
@@ -19,11 +16,7 @@ const CategorySchema = new Schema({
     modifiedAt: {
         type: Date,
         default: Date.now()
-    },
-    isActive: {
-        type: Boolean,
-        default: true
     }
 });
 
-export default model('Category', CategorySchema);
+export default new model('Gender', Gender);

@@ -4,12 +4,13 @@ const productSchema = new Schema({
     productName: { type: String, required: true },
     taxClass: { type: String, required: true },
     vatAmount: { type: String, required: true },
-    basePrice: { type: String, required: true },
+    basePrice: { type: Number, required: true },
     categories: [{ value: String, label: String }],
+    gender: [{ value: String, label: String }],
     tags: [{ value: String, label: String }],
     variants: [{
-        variantValue: { type: String, required: true },
-        variantType: { value: String, label: String }
+        value: { type: String},
+        label: { type: String}
     }],
     description: { type: String, required: true },
     status: { value: String, label: String },
@@ -49,7 +50,6 @@ const productSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: "User",
                 required: false,
-                default: "66715d2df7321f79928501dd"
             },
             name: {
                 type: String,
@@ -77,21 +77,16 @@ const productSchema = new Schema({
                 type: Date,
                 default: Date.now()
             },
-            numOfReviews: {
-                type: Number,
-                default: 0,
-            },
-            ratings: {
-                type: Number,
-                default: 0,
-            },
         },
     ],
-    // user: {
-    //     type: Schema.ObjectId,
-    //     ref: "User",
-    //     required: true,
-    // },
+    numOfReviews: {
+        type: Number,
+        default: 0,
+    },
+    ratings: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const Product = model('Product', productSchema);

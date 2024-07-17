@@ -19,6 +19,7 @@ const ProductList = () => {
   const [sortBy, setSortBy] = useState("productName");
   const [sortOrder, setSortOrder] = useState("asc");
   const [limit, setLimit] = useState(5);
+  const [category, setCategory] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isProductDeleted, setIsProductDeleted] = useState(false);
@@ -42,6 +43,7 @@ const ProductList = () => {
         search,
         sortOrder,
         limit,
+        category
       });
       debouncedFetchResults(params);
       setIsSearching(false);
@@ -60,6 +62,7 @@ const ProductList = () => {
       sortBy,
       sortOrder,
       limit,
+      category,
     });
 
     fetchProducts(params);
@@ -86,6 +89,7 @@ const ProductList = () => {
         sortBy,
         sortOrder,
         limit,
+        category,
       });
 
       fetchProducts(params);
@@ -282,7 +286,7 @@ const ProductList = () => {
                             <td>
                               <div className="d-flex align-items-center">
                                 <img
-                                  src={prod?.thumbnail[0]?.url}
+                                  src={prod?.image[0]}
                                   className="rounded-circle"
                                   alt={"thumbnail"}
                                   width="56"
@@ -293,13 +297,13 @@ const ProductList = () => {
                                     {prod?.productName}
                                   </h6>
                                   <div className="d-flex align-items-center">
-                                    {prod?.categories.map((categ, index1) => {
+                                    {prod?.categories?.map((categ, index1) => {
                                       return (
                                         <p className="mb-0" key={index1}>
                                           {index1 + 1 !=
                                           prod?.categories?.length
-                                            ? `${categ?.label} ,`
-                                            : categ?.label}
+                                            ? `${categ} ,`
+                                            : categ}
                                         </p>
                                       );
                                     })}

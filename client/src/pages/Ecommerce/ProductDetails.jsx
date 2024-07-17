@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import ReactEditor from "../../components/Editor/TextEditor";
 import ReviewCard from "../../components/ReviewCard/ReviewCard";
 import Loader from "../../components/Loader/Loader";
+import { useSelector } from "react-redux";
 
 const ProductDetails = () => {
   const [productDetail, setProductDetail] = useState({});
@@ -43,7 +44,11 @@ const ProductDetails = () => {
     ?.filter((x) => x.variantType?.value === "color")
     ?.map((x) => x.variantValue);
   const reviewCloseBtnRef = useRef(null);
-
+const {
+  isAdmin,
+  isLoggedIn,
+  loginUserData: user,
+} = useSelector((state) => state.auth);
   const handleQuantity = (type) => {
     if (type === "+") {
       setQuality(quality + 1);
@@ -76,7 +81,7 @@ const ProductDetails = () => {
     rating: 0,
     comment: "",
     productId: productId,
-    user: null,
+    user: user?._id,
   });
 
   console.log("reviewForm", reviewForm);
@@ -328,7 +333,7 @@ const ProductDetails = () => {
                       <div className="card-body text-center p-4 d-flex flex-column justify-content-center">
                         <h6 className="mb-3">Average Rating</h6>
                         <h2 className="text-primary mb-3 fw-semibold fs-9">
-                          {ratings}/5
+                          {ratings || 0}/5
                         </h2>
                         <div className="text-center d-flex justify-content-center">
                           <RatingComponent rating={ratings} readOnly={true} />

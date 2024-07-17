@@ -66,3 +66,19 @@ export const checkPassword = (password) => {
     return getStrength(password);
 
 }
+
+
+/**
+ * only allow number with maxlength
+ * @param {*} e input element
+ * @returns element
+ */
+const handleNumberValidation = (e) => {
+    if (e.target.value === e.target.maxLength) {
+        e.preventDefault();
+    }
+    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+    return e;
+}
+
+export { handleNumberValidation };

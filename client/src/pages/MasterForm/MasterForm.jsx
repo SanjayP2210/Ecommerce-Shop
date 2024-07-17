@@ -166,8 +166,8 @@ const MasterForm = () => {
     <>
       <Loader visible={isLoading} />
       <div className="row common-form">
-        <div className="col-md-4"></div>
-        <div className="col-md-4">
+        <div className="col-md-3"></div>
+        <div className="col-md-5">
           <div className="mt-5">
             <div className="card">
               <div className="card-body">
@@ -193,7 +193,7 @@ const MasterForm = () => {
             </div>
             <div className="card">
               <div className="card-body">
-                <ul className="nav nav-pills p-3 mb-3 rounded align-items-center card flex-row">
+                <ul className="nav nav-pills p-3 mb-3 rounded align-items-center card flex-row d-flex justify-content-center">
                   <li
                     className="nav-item"
                     onClick={(e) => {

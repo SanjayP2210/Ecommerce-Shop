@@ -1,67 +1,83 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useState } from "react";
+import Nouislider from "nouislider-react";
+import "./index.css";
+import { handleNumberValidation } from "../../constants/utilities";
 
-export const RangeSlider = ({ rangeRef, rangeValue, setRangeValue, id, min ,max}) => {
-  const handleRangeChange = (event) => {
-    const newValue = event.target.value;
-    setRangeValue(newValue);
+export const RangeSlider = ({
+  rangeValue,
+  setRangeValue,
+  min,
+  max,
+  isPricingRange = false,
+  steps=5,
+}) => {
+  const [rangeArray, setRangeArray] = useState([]);
+  useEffect(() => {
+    if (min != null && max != null) {
+      const stepSize = max / steps;
+      const result = [];
+
+      for (let i = 0; i <= steps; i++) {
+        result.push(i * stepSize);
+      }
+      setRangeArray(result);
+    }
+  }, [min, max]);
+
+  const sliderRef = useRef(null);
+
+  // useEffect(() => {
+  //   const range = rangeRef?.current;
+  //   const tooltip = document.getElementById(`slider_tooltip-${id}`);
+  //   const tooltipLabel = document.getElementById(`slider_tooltip_label-${id}`);
+  //   if (range) {
+  //     const updateTooltip = () => {
+  //       const value = range?.value;
+  //       const percentage =
+  //         ((value - range.min) / (range.max - range.min)) * 100;
+  //       tooltip.style.left = `calc(${percentage}% + (${
+  //         8 - percentage * 0.15
+  //       }px))`; // Adjust to align with the thumb
+  //       tooltipLabel.textContent = isPricingRange ? value : `${value}%`;
+  //     };
+
+  //     // Initial update
+  //     updateTooltip();
+
+  //     // Update tooltip on range input change
+  //     range.addEventListener("input", updateTooltip);
+
+  //     // Update tooltip on range input change
+  //     range.addEventListener("mouseup", function () {
+  //       this.blur();
+  //     });
+  //   }
+  // }, [rangeRef]);
+
+  const onUpdate = (values) => {
+    setRangeValue(values.map((val) => parseFloat(val).toFixed(2)));
   };
 
-  useEffect(() => {
-    const range = rangeRef?.current;
-    const tooltip = document.getElementById(`slider_tooltip-${id}`);
-    const tooltipLabel = document.getElementById(`slider_tooltip_label-${id}`);
-    if (range) {
-      const updateTooltip = () => {
-        const value = range?.value;
-        const percentage =
-          ((value - range.min) / (range.max - range.min)) * 100;
-        tooltip.style.left = `calc(${percentage}% + (${
-          8 - percentage * 0.15
-        }px))`; // Adjust to align with the thumb
-        tooltipLabel.textContent = `${value}%`;
-      };
-
-      // Initial update
-      updateTooltip();
-
-      // Update tooltip on range input change
-      range.addEventListener("input", updateTooltip);
-
-      // Update tooltip on range input change
-      range.addEventListener("mouseup", function () {
-        this.blur();
-      });
-    }
-  }, [rangeRef]);
-
   return (
-    <div className="range-slider__wrap">
-        <input
-          type="range"
-          id="customRange1"
-          min={min || "0"}
-          max={max || "100"}
-          ref={rangeRef}
-          value={rangeValue}
-          onChange={handleRangeChange}
-          className="range-slider range-slider--primary"
+    <>
+      <div className="range-slider">
+        <Nouislider
+          start={rangeValue}
+          ref={sliderRef}
+          connect={isPricingRange ? true : [true, false]}
+          range={{
+            min: [min],
+            max: max,
+          }}
+          tooltips={true}
+          pips={{
+            mode: "values",
+            values: rangeArray || [],
+            density: 4,
+          }}
+          onUpdate={onUpdate}
         />
-        <div className="range-min-max-label">
-          <div>{min}</div>
-          <div> {max}</div>
-        </div>
-        <div
-          id={`slider_tooltip-${id}`}
-          className="range-slider__tooltip range-slider__tooltip--on range-slider__tooltip--top tooltip"
-        >
-          <div
-            id={`slider_tooltip_label-${id}`}
-            className="range-slider__tooltip__label"
-          >
-            {`${rangeValue}%`}
-          </div>
-          <div className="range-slider__tooltip__caret"></div>
-        </div>
-    </div>
+      </div>
+    </>
   );
 };
