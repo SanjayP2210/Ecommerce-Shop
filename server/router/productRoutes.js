@@ -8,7 +8,7 @@ router.post('/', addProduct);
 router.get('/shop', getProductForShop);
 router.get('/:id', getProductById);
 router.put('/review', createProductReview);
-router.get('/review', getProductReviews);
+router.get('/review/:id', getProductReviews);
 router.delete('/review', deleteReview);
 router.put('/:id', getProduct, updateProduct);
 router.delete('/:id', getProduct, deleteProduct);

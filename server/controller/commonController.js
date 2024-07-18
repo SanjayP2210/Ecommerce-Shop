@@ -8,10 +8,16 @@ import fs from 'fs';
 const getAll = (Model, controllerName) => async (req, res, next,) => {
     try {
         const type = req.params.type;
-        const docs = await Model.find(type != 'master' ? { isActive: true } : {});
+        let list = [];
+        if (type !== 'master') {
+            list = await Model.find({}, { name: 1 });
+        } else {
+          list= await Model.find(type != 'master' ? { isActive: true } : {});
+        }
         console.log('Model', Model)
-        res.status(200).send({ [controllerName?.toLowerCase()]: docs });
+        res.status(200).send({ [controllerName?.toLowerCase()]: list });
     } catch (error) {
+        console.log(`eror while fetching getAll of ${controller}`);
         res.status(500).send(error);
     }
 }

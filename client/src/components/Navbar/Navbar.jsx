@@ -7,7 +7,9 @@ import iconFlagSa from "../../assets/images/flag/icon-flag-sa.svg";
 import user1 from "../../assets/images/profile/user-1.jpg";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { addItem, removeItem } from "../../reducers/cartReducer";
 
 const Navbar = () => {
   const {
@@ -15,6 +17,14 @@ const Navbar = () => {
     isLoggedIn,
     loginUserData: user,
   } = useSelector((state) => state.auth);
+  const {
+    totalCount: cartCount,
+    items,
+    totalPrice,
+  } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+  console.log("items", items);
+
   //   function handleColorTheme(e) {
   //     document.documentElement.setAttribute("data-color-theme", e);
   //   }
@@ -153,7 +163,7 @@ const Navbar = () => {
                                     to="/profile"
                                     className="d-flex align-items-center pb-9 position-relative"
                                   >
-                                    <div className="bg-success-subtle rounded round-48 me-3 d-flex align-items-center justify-content-center">
+                                    <div className="bg-primary-subtle rounded round-48 me-3 d-flex align-items-center justify-content-center">
                                       <Icon
                                         icon="solar:user-bold-duotone"
                                         className="fs-7 text-success"
@@ -298,6 +308,19 @@ const Navbar = () => {
                       <Icon
                         icon="solar:sun-2-line-duotone"
                         className={"sun fs-6"}
+                      ></Icon>
+                    </Link>
+                  </li>
+                  <li className="nav-item d-block d-xl-none">
+                    <Link
+                      className="nav-link nav-icon-hover-bg rounded-circle"
+                      href="javascript:void(0)"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                    >
+                      <Icon
+                        icon="solar:className=-large-2-line-duotone"
+                        className={"fs-6"}
                       ></Icon>
                     </Link>
                   </li>
@@ -1098,6 +1121,39 @@ const Navbar = () => {
                       ></Icon>
                     </Link>
                   </li>
+                  <li className="nav-item d-block d-xl-none">
+                    <Link
+                      className="nav-link nav-icon-hover-bg rounded-circle"
+                      href="javascript:void(0)"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                    >
+                      <Icon
+                        icon="solar:magnifer-line-duotone"
+                        className={"fs-6"}
+                      ></Icon>
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      type="button"
+                      className="position-relative fs-6 text-decoration-none"
+                      style={{ color: "#526b7a" }}
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasRight"
+                      aria-controls="offcanvasRight"
+                    >
+                      <i className="ti ti-shopping-cart"></i>
+                      {cartCount > 0 && (
+                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                          {cartCount}
+                          <span className="visually-hidden">
+                            unread messages
+                          </span>
+                        </span>
+                      )}
+                    </Link>
+                  </li>
                   <li className="nav-item">
                     <Link
                       className="nav-link nav-icon-hover-bg rounded-circle moon dark-layout"
@@ -1128,12 +1184,11 @@ const Navbar = () => {
                       data-bs-target="#exampleModal"
                     >
                       <Icon
-                        icon="solar:magnifer-line-duotone"
+                        icon="solar:className=-large-2-line-duotone"
                         className={"fs-6"}
                       ></Icon>
                     </Link>
                   </li>
-
                   <li className="nav-item dropdown nav-icon-hover-bg rounded-circle">
                     <Link
                       className="nav-link position-relative"
@@ -1472,7 +1527,7 @@ const Navbar = () => {
                   </li>
                   <li className="sidebar-item">
                     <Link href="../main/index2.html" className="sidebar-link">
-                      <i className="ti ti-shopping-cart"></i>
+                      <i className="ti ti-shopping-className="></i>
                       <span className="hide-menu">Dashboard 2</span>
                     </Link>
                   </li>
@@ -1521,7 +1576,7 @@ const Navbar = () => {
                   </li>
                   <li className="sidebar-item">
                     <Link to="/eccommerce/shop" className="sidebar-link">
-                      <i className="ti ti-shopping-cart"></i>
+                      <i className="ti ti-shopping-className="></i>
                       <span className="hide-menu">Shop</span>
                     </Link>
                   </li>
@@ -1665,8 +1720,108 @@ const Navbar = () => {
           {/*  */}
         </div>
       </aside>
+
+      <div
+        className="offcanvas offcanvas-end"
+        tabIndex="-1"
+        id="offcanvasRight"
+        aria-labelledby="offcanvasRightLabel"
+      >
+        <div className="offcanvas-header">
+          <h5 className="offcanvas-title" id="offcanvasExampleLabel">
+            Shopping Cart
+          </h5>
+          <button
+            type="button"
+            className="btn-close text-reset"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div className="offcanvas-body">
+          <div className="container mt-1">
+            <div className="card">
+              <div>
+                  {items?.map((product) => {
+                    return (
+                      <>
+                        <div
+                          className="row no-gutters"
+                          style={{ padding: "10px 0px" }}
+                        >
+                          {/* <div style={{ padding: "10px 0px" }}> */}
+                          <div className="col-md-4">
+                            <img
+                              src={product?.image[0]}
+                              style={{ width: "80px" }}
+                              className="card-img"
+                              alt="Cute Soft Teddybear"
+                            />
+                          </div>
+                          <div className="col-md-8">
+                            <h6 className="card-title">
+                              {product?.productName}
+                            </h6>
+                            <p className="card-text">toys</p>
+                            <div className="d-flex align-items-center justify-content-between">
+                              <h6 className="mb-0">${product?.basePrice}</h6>
+                              <div
+                                className="btn-group ml-3"
+                                role="group"
+                                aria-label="Quantity buttons"
+                              >
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-primary btn-sm"
+                                  onClick={() =>
+                                    dispatch(removeItem(product?._id))
+                                  }
+                                >
+                                  -
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-primary btn-sm"
+                                >
+                                  <b>{product?.quantity}</b>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-primary btn-sm"
+                                  onClick={() => dispatch(addItem(product))}
+                                  disabled={product?.quantity === product?.stock}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          {/* </div> */}
+                        </div>
+                        <hr />
+                      </>
+                    );
+                  })}
+              </div>
+              {totalPrice > 0 && <div className="container">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h6>Total</h6>
+                  <h6>{totalPrice}</h6>
+                </div>
+                <div className="d-flex justify-content-center">
+                  <button className="btn btn-primary btn-lg btn-block mt-3" type="button">
+                    Checkout
+                  </button>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
 
 export default Navbar;
+ 

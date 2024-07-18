@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import Product from '../models/Product.js';
 
 // Create a new product
@@ -93,6 +94,7 @@ const getProductForShop = async (req, res) => {
                     productName: 1,
                     basePrice: 1,
                     _id: 1,
+                    stock:1,
                     image: {
                         $map: {
                             input: '$thumbnail',
@@ -142,6 +144,8 @@ const getProducts = async (req, res) => {
                     basePrice: 1,
                     _id: 1,
                     createdAt:1,
+                    description: 1,
+                    stock: 1,
                     image: {
                         $map: {
                             input: '$thumbnail',
@@ -268,7 +272,7 @@ const createProductReview = async (req, res) => {
         if (isReviewed) {
             product.reviews.forEach((rev) => {
                 if (rev?.user?.toString() === (req?.user?._id?.toString() || userId))
-                    (rev.rating = rating), (rev.comment = comment), (rev.modifiedAt = Date.now());
+                    (rev.rating = rating), (rev.comment = comment), (rev.modifiedAt = moment().tz('Asia/Kolkata').format());
             });
         } else {
             product.reviews.push(review);
@@ -297,16 +301,18 @@ const createProductReview = async (req, res) => {
 }
 
 // Get All Reviews of a product
-const getProductReviews = async (req, res, next) => {
-    const product = await Product.findById(req.query.id);
+const getProductReviews = async (req, res) => {
+    const product = await Product.findById(req.params.id);
 
     if (!product) {
-        return next(new ErrorHander("Product not found", 404));
+        return res.status(400).json({ message: "Product not found", isError: true })
     }
 
     res.status(200).json({
         success: true,
         reviews: product.reviews,
+        numOfReviews: product.numOfReviews,
+        ratings: product.ratings,
     });
 }
 
@@ -315,7 +321,7 @@ const deleteReview = async (req, res, next) => {
     const product = await Product.findById(req.query.productId);
 
     if (!product) {
-        return next(new ErrorHander("Product not found", 404));
+        return res.status(400).json({ message: "Product not found", isError:true})
     }
 
     const reviews = product.reviews.filter(

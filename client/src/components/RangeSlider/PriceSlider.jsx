@@ -27,6 +27,17 @@ const [rangeArray, setRangeArray] = useState([]);
     }
   }, [min, max]);
 
+  console.log("maxRef.current", maxRef.current);
+
+  useEffect(() => {
+    if (minRef.current) {
+      minRef.current.value = 0;
+    }
+    if (maxRef.current) {
+      maxRef.current.value = 1000;
+    }
+  }, [minRef.current, maxRef.current]);
+
   const handleInputChange = (e, index) => {
     const newValue = [...rangeValue];
     newValue[index] = parseFloat(e.target.value) || 0;
@@ -44,7 +55,7 @@ const [rangeArray, setRangeArray] = useState([]);
 
   return (
     <div className="range-slider">
-      {rangeValue && (
+      {rangeArray?.length  > 0 && (
         <>
           <Nouislider
             start={rangeValue}
@@ -54,13 +65,13 @@ const [rangeArray, setRangeArray] = useState([]);
               min: [min],
               max: max,
             }}
-            behaviour={'drag'}
+            behaviour={"smooth-steps-tap"}
             pips={{
               mode: "values",
-              values:rangeArray,
+              values: rangeArray,
               density: 4,
             }}
-            onUpdate={onUpdate}
+            onSet={onUpdate}
           />
           <div
             className="input-group border rounded-1"

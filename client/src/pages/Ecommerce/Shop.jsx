@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import apiService from "../../service/apiService";
-import { toast } from "react-toastify";
+import { Slide, toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import megaDDBG from "../../assets/images/backgrounds/mega-dd-bg.jpg";
 import RatingComponent from "../../components/Rating/RatingComponent";
 import _, { debounce } from "lodash";
 import Loader from "../../components/Loader/Loader";
 import "./index.css";
-import { RangeSlider } from "../../components/RangeSlider/RangeSlider";
 import PriceSliderComponent from "../../components/RangeSlider/PriceSlider";
 import PriceSortBy from "./PriceSortBy";
 import CategoryFilter from "./CategoryFilter";
 import Select2 from "../../components/Select2/Select2";
+import { useDispatch } from "react-redux";
+import { addItem, removeItem } from "../../reducers/cartReducer";
 
 const Shop = () => {
   const [productList, setProductList] = useState([]);
@@ -31,6 +32,7 @@ const Shop = () => {
   const [isRangeValueChange, setIsRangeValueChange] = useState(false);
   const [genderList, setGenderList] = useState([]);
   const [selectedGender, setSelectedGender] = useState('');
+   const dispatch = useDispatch();
   const handleSortBy = (value) => {
     setSortBy(value?.field);
     setSortOrder(value?.order);
@@ -48,6 +50,39 @@ const Shop = () => {
   }
   useEffect(() => {fetchGender()}, []);
   
+  const handleAddToCart = (product) => {
+    dispatch(addItem(product));
+     toast.info("Item added to cart!", {
+       position: "top-center",
+       autoClose: 2000,
+       hideProgressBar: false,
+       closeOnClick: true,
+       pauseOnHover: false,
+       draggable: true,
+       progress: undefined,
+       closeButton: false,
+       theme: "colored",
+       icon: (
+         <span className="fs-6 text-center">
+           {" "}
+           <i className="ti ti-circle-check"></i>
+         </span>
+       ),
+       className: "custom-toast",
+       style: {
+         backgroundColor: "#635BFF",
+         color: "white",
+         fontSize: "1rem",
+       },
+       toastId: "unique-toast-id",
+       transition: Slide,
+     });
+  };
+
+  const handleRemoveFromCart = (productId) => {
+    dispatch(removeItem(productId));
+  };
+
    const fetchCategories = async () => {
      try {
        const response = await apiService.getRequest("category");
@@ -285,6 +320,7 @@ const Shop = () => {
                   <div>
                     <PriceSliderComponent
                       min={0}
+                      steps={2}
                       max={50000}
                       rangeRef={rangeRef}
                       rangeValue={rangeValue}
@@ -307,7 +343,7 @@ const Shop = () => {
                       isMultiple={false}
                       handleOnChange={(event) => {
                         if (event === null) {
-                          setSelectedGender('');
+                          setSelectedGender("");
                         } else {
                           setSelectedGender(event?.value);
                         }
@@ -499,6 +535,10 @@ const Shop = () => {
                                 data-bs-toggle="tooltip"
                                 data-bs-placement="top"
                                 data-bs-title="Add To Cart"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleAddToCart(product)
+                                }}
                               >
                                 <i className="ti ti-basket fs-4"></i>
                               </a>
