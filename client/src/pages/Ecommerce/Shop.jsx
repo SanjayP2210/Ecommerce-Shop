@@ -543,8 +543,8 @@ const Shop = () => {
                                 <i className="ti ti-basket fs-4"></i>
                               </a>
                             </div>
-                            <div className="card-body pt-3 p-4">
-                              <h6 className="fw-semibold fs-4">
+                            <div className="card-body pt-3 p-4 product-text-body">
+                              <h6 className="fw-semibold fs-4 product-name-tag">
                                 {product?.productName}
                               </h6>
                               <div className="d-flex align-items-center justify-content-between">

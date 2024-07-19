@@ -16852,8 +16852,15 @@ body pre[class*=language-] {
     position: absolute
 }
 
+.hover-img{
+  max-height :258px;
+}
+
 .hover-img img {
-    transition: transform .2s
+    transition: transform .2s;
+    height:100%;
+    width:100%;
+    object-fit:contain;
 }
 
 .hover-img:hover img {
@@ -17639,4 +17646,16 @@ h6 {
 
 .range-slider{
     margin:20px 0px;
+}
+
+.product-text-body{
+    min-height:125px;
+}
+.product-name-tag{
+     display: -webkit-box;         /* Creates a flexbox container */
+  -webkit-box-orient: vertical; /* Vertical orientation */
+  -webkit-line-clamp: 2;        /* Number of lines to show */
+  overflow: hidden;             /* Hides overflowed text */
+  text-overflow: ellipsis;
+min-height: 45px;
 }

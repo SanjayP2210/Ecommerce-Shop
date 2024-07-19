@@ -61,21 +61,21 @@ const Select2 = ({
       borderColor: "#ced4da",
       cursor: "pointer",
       "&:hover": {
-        borderColor: "#635BFF",
+        borderColor: "var(--bs-primary);",
       },
       boxShadow: "none",
     }),
     multiValue: (base) => ({
       ...base,
-      backgroundColor: "#635BFF",
+      backgroundColor: "var(--bs-primary);",
       borderRadius: "8px",
-      borderColor: "#635BFF",
+      borderColor: "var(--bs-primary);",
       color: "#fff",
     }),
     multiValueLabel: (base) => ({
       ...base,
       color: "white",
-      backgroundColor: "#635BFF",
+      backgroundColor: "var(--bs-primary);",
       borderRadius: "8px",
     }),
     multiValueRemove: (base) => ({
@@ -92,15 +92,15 @@ const Select2 = ({
       return {
         ...styles,
         backgroundColor: isDisabled ? null : "white",
-        color: isDisabled ? "#ccc" : isSelected,
+        color: "black",
         cursor: isDisabled ? "not-allowed" : "pointer",
         "&:hover": {
-          backgroundColor: isFocused ? "#635BFF" : "white",
+          backgroundColor: isFocused ? "var(--bs-primary);" : "white",
           color: "white",
         },
         ":active": {
           ...styles[":active"],
-          backgroundColor: !isDisabled && (isSelected ? data.color : "#635BFF"),
+          backgroundColor: !isDisabled && (isSelected ? data.color : "var(--bs-primary);"),
         },
       };
     },

@@ -110,10 +110,7 @@ const MasterForm = () => {
             <td style={{ color: "black" }}>
               <p
                 style={{
-                  textDecoration:
-                    !item?.isActive
-                      ? "line-through"
-                      : "none",
+                  textDecoration: !item?.isActive ? "line-through" : "none",
                 }}
               >
                 {item?.name}
@@ -128,7 +125,10 @@ const MasterForm = () => {
                     handleEdit(item);
                   }}
                 >
-                  <i style={{ color: "#635BFF" }} className="ti ti-edit"></i>
+                  <i
+                    style={{ color: "var(--bs-primary)" }}
+                    className="ti ti-edit"
+                  ></i>
                 </a>
               )}
               <a

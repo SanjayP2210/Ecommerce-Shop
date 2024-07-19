@@ -81,4 +81,43 @@ const handleNumberValidation = (e) => {
     return e;
 }
 
-export { handleNumberValidation };
+const  setThemeAttributes = (
+    theme,
+    darkDisplay,
+    lightDisplay,
+    sunDisplay,
+    moonDisplay
+)  => {
+    document.documentElement.setAttribute("data-bs-theme", theme);
+    if (document.getElementById(`${theme}-layout`)) {
+        document.getElementById(`${theme}-layout`).checked = true;
+    }
+
+    document
+        .querySelectorAll(`.${darkDisplay}`)
+        .forEach((el) => (el.style.display = "none"));
+    document
+        .querySelectorAll(`.${lightDisplay}`)
+        .forEach((el) => (el.style.display = "flex"));
+    document
+        .querySelectorAll(`.${sunDisplay}`)
+        .forEach((el) => (el.style.display = "none"));
+    document
+        .querySelectorAll(`.${moonDisplay}`)
+        .forEach((el) => (el.style.display = "flex"));
+}
+
+export { handleNumberValidation, setThemeAttributes };
+
+
+// document.querySelectorAll(".dark-layout").forEach((element) => {
+//     element.addEventListener("click", () =>
+//         setThemeAttributes("dark", "dark-logo", "light-logo", "moon", "sun")
+//     );
+// });
+
+// document.querySelectorAll(".light-layout").forEach((element) => {
+//     element.addEventListener("click", () =>
+//         setThemeAttributes("light", "light-logo", "dark-logo", "sun", "moon")
+//     );
+// });

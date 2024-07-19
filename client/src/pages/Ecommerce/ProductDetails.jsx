@@ -270,6 +270,7 @@ const {
                           <i className="ti ti-minus"></i>
                         </button>
                         <input
+                          readOnly="true"
                           type="text"
                           className="min-width-40 flex-grow-0 border border-muted text-muted fs-4 fw-semibold form-control text-center qty"
                           placeholder=""

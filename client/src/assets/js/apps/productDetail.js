@@ -21,6 +21,8 @@ $(function () {
         '<svg width="12" height="12" viewBox="0 0 11 20" version="1.1"><path style="fill:none;stroke-width: 3px;stroke: #fff;" d="M1.054,18.214l8.606,-8.606l-8.606,-8.607"/></svg>',
       ],
     })
+
+    
     .on("changed.owl.carousel", syncPosition);
 
   sync2

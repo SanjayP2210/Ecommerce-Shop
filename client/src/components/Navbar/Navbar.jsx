@@ -4,12 +4,11 @@ import iconFlagEn from "../../assets/images/flag/icon-flag-en.svg";
 import iconFlagCn from "../../assets/images/flag/icon-flag-cn.svg";
 import iconFlagFr from "../../assets/images/flag/icon-flag-fr.svg";
 import iconFlagSa from "../../assets/images/flag/icon-flag-sa.svg";
-import user1 from "../../assets/images/profile/user-1.jpg";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
 import { addItem, removeItem } from "../../reducers/cartReducer";
+import { setThemeAttributes } from "../../constants/utilities";
 
 const Navbar = () => {
   const {
@@ -28,6 +27,7 @@ const Navbar = () => {
   //   function handleColorTheme(e) {
   //     document.documentElement.setAttribute("data-color-theme", e);
   //   }
+
   return (
     <>
       <header className="topbar">
@@ -293,6 +293,16 @@ const Navbar = () => {
                     <Link
                       className="nav-link moon dark-layout nav-icon-hover-bg rounded-circle"
                       href="javascript:void(0)"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setThemeAttributes(
+                          "dark",
+                          "dark-logo",
+                          "light-logo",
+                          "moon",
+                          "sun"
+                        );
+                      }}
                       style={{ padding: "0px" }}
                     >
                       <Icon
@@ -303,6 +313,16 @@ const Navbar = () => {
                     <Link
                       className="nav-link sun light-layout nav-icon-hover-bg rounded-circle"
                       href="javascript:void(0)"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setThemeAttributes(
+                          "light",
+                          "light-logo",
+                          "dark-logo",
+                          "sun",
+                          "moon"
+                        );
+                      }}
                       style={{ display: "none" }}
                     >
                       <Icon
@@ -1154,38 +1174,49 @@ const Navbar = () => {
                       )}
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item  nav-icon-hover-bg rounded-circle moon dark-layout">
                     <Link
-                      className="nav-link nav-icon-hover-bg rounded-circle moon dark-layout"
+                      className="nav-link"
                       href="javascript:void(0)"
-                      style={{ padding: "0px" }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setThemeAttributes(
+                          "dark",
+                          "dark-logo",
+                          "light-logo",
+                          "moon",
+                          "sun"
+                        );
+                      }}
                     >
                       <Icon
                         icon="solar:moon-line-duotone"
                         className={"moon fs-6"}
                       ></Icon>
                     </Link>
-                    <Link
-                      className="nav-link nav-icon-hover-bg rounded-circle sun light-layout"
-                      href="javascript:void(0)"
-                      style={{ display: "none" }}
-                    >
-                      <Icon
-                        icon="solar:sun-2-line-duotone"
-                        className={"sun fs-6"}
-                      ></Icon>
-                    </Link>
                   </li>
-                  <li className="nav-item d-block d-xl-none">
+                  <li
+                    className="nav-item nav-icon-hover-bg rounded-circle sun light-layout"
+                    style={{ display: "none" }}
+                  >
                     <Link
-                      className="nav-link nav-icon-hover-bg rounded-circle"
+                      className="nav-link"
                       href="javascript:void(0)"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setThemeAttributes(
+                          "light",
+                          "light-logo",
+                          "dark-logo",
+                          "sun",
+                          "moon"
+                        );
+                      }}
                     >
                       <Icon
-                        icon="solar:className=-large-2-line-duotone"
-                        className={"fs-6"}
+                        icon="solar:sun-line-duotone"
+                        className={"sun fs-6"}
+                        style={{ fontSize: "24px" }}
                       ></Icon>
                     </Link>
                   </li>
@@ -1742,79 +1773,81 @@ const Navbar = () => {
           <div className="container mt-1">
             <div className="card">
               <div>
-                  {items?.map((product) => {
-                    return (
-                      <>
-                        <div
-                          className="row no-gutters"
-                          style={{ padding: "10px 0px" }}
-                        >
-                          {/* <div style={{ padding: "10px 0px" }}> */}
-                          <div className="col-md-4">
-                            <img
-                              src={product?.image[0]}
-                              style={{ width: "80px" }}
-                              className="card-img"
-                              alt="Cute Soft Teddybear"
-                            />
-                          </div>
-                          <div className="col-md-8">
-                            <h6 className="card-title">
-                              {product?.productName}
-                            </h6>
-                            <p className="card-text">toys</p>
-                            <div className="d-flex align-items-center justify-content-between">
-                              <h6 className="mb-0">${product?.basePrice}</h6>
-                              <div
-                                className="btn-group ml-3"
-                                role="group"
-                                aria-label="Quantity buttons"
+                {items?.map((product) => {
+                  return (
+                    <>
+                      <div
+                        className="row no-gutters"
+                        style={{ padding: "10px 0px" }}
+                      >
+                        {/* <div style={{ padding: "10px 0px" }}> */}
+                        <div className="col-md-4">
+                          <img
+                            src={product?.image[0]}
+                            style={{ width: "80px" }}
+                            className="card-img"
+                            alt="Cute Soft Teddybear"
+                          />
+                        </div>
+                        <div className="col-md-8">
+                          <h6 className="card-title">{product?.productName}</h6>
+                          <p className="card-text">toys</p>
+                          <div className="d-flex align-items-center justify-content-between">
+                            <h6 className="mb-0">${product?.basePrice}</h6>
+                            <div
+                              className="btn-group ml-3"
+                              role="group"
+                              aria-label="Quantity buttons"
+                            >
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() =>
+                                  dispatch(removeItem(product?._id))
+                                }
                               >
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-primary btn-sm"
-                                  onClick={() =>
-                                    dispatch(removeItem(product?._id))
-                                  }
-                                >
-                                  -
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-primary btn-sm"
-                                >
-                                  <b>{product?.quantity}</b>
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-primary btn-sm"
-                                  onClick={() => dispatch(addItem(product))}
-                                  disabled={product?.quantity === product?.stock}
-                                >
-                                  +
-                                </button>
-                              </div>
+                                -
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary btn-sm"
+                              >
+                                <b>{product?.quantity}</b>
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() => dispatch(addItem(product))}
+                                disabled={product?.quantity === product?.stock}
+                              >
+                                +
+                              </button>
                             </div>
                           </div>
-                          {/* </div> */}
                         </div>
-                        <hr />
-                      </>
-                    );
-                  })}
+                        {/* </div> */}
+                      </div>
+                      <hr />
+                    </>
+                  );
+                })}
               </div>
-              {totalPrice > 0 && <div className="container">
-                <div className="d-flex justify-content-between align-items-center">
-                  <h6>Total</h6>
-                  <h6>{totalPrice}</h6>
+              {totalPrice > 0 && (
+                <div className="container">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h6>Total</h6>
+                    <h6>{totalPrice}</h6>
+                  </div>
+                  <div className="d-flex justify-content-center">
+                    <button
+                      className="btn btn-primary btn-lg btn-block mt-3"
+                      type="button"
+                    >
+                      Checkout
+                    </button>
+                  </div>
                 </div>
-                <div className="d-flex justify-content-center">
-                  <button className="btn btn-primary btn-lg btn-block mt-3" type="button">
-                    Checkout
-                  </button>
-                </div>
-              </div>
-              }
+              )}
             </div>
           </div>
         </div>
