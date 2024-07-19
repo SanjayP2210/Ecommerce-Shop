@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from "bcryptjs";
 import { Schema } from "mongoose";
 import crypto from 'crypto';
+import moment from "moment-timezone";
 
 const userSchema = new mongoose.Schema({
     image: {
@@ -45,7 +46,7 @@ const userSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     },
     createdBy: {
         type: Schema.Types.ObjectId
@@ -55,10 +56,12 @@ const userSchema = new mongoose.Schema({
     },
     modifiedAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     },
+    cart: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
+    themeColor :{type: String, default:'light',required:false},
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
 })
 
 userSchema.pre("save", async function (next) {

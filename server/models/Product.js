@@ -1,19 +1,20 @@
-import { Schema,model } from "mongoose";
+import moment from "moment-timezone";
+import { Schema, model } from "mongoose";
 
 const productSchema = new Schema({
     productName: { type: String, required: true },
     taxClass: { type: String, required: true },
     vatAmount: { type: String, required: true },
     basePrice: { type: Number, required: true },
-    categories: [{ value: String, label: String }],
-    gender: [{ value: String, label: String }],
-    tags: [{ value: String, label: String }],
+    categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    gender: [{ type: Schema.Types.ObjectId, ref: 'Gender' }],
+    tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
     variants: [{
-        value: { type: String},
-        label: { type: String}
+        value: { type: String },
+        label: { type: Schema.Types.ObjectId, ref: 'Variant' }
     }],
     description: { type: String, required: true },
-    status: { value: String, label: String },
+    status: [{ type: Schema.Types.ObjectId, ref: 'Status' }],
     template: { value: String, label: String },
     thumbnail: [{
         public_id: String,
@@ -24,9 +25,24 @@ const productSchema = new Schema({
         url: String
     }],
     discountType: { type: String, required: true },
+    stock: {
+        type: Number,
+        required: [true, "Please Enter product Stock"],
+        maxLength: [4, "Stock cannot exceed 4 characters"],
+        default: 1,
+    },
+    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    numOfReviews: {
+        type: Number,
+        default: 0,
+    },
+    ratings: {
+        type: Number,
+        default: 0,
+    },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: moment().tz('Asia/Kolkata').format()
     },
     createdBy: {
         type: Schema.Types.ObjectId
@@ -36,56 +52,7 @@ const productSchema = new Schema({
     },
     modifiedAt: {
         type: Date,
-        default: Date.now()
-    },
-    stock: {
-        type: Number,
-        required: [true, "Please Enter product Stock"],
-        maxLength: [4, "Stock cannot exceed 4 characters"],
-        default: 1,
-    },
-    reviews: [
-        {
-            user: {
-                type: Schema.Types.ObjectId,
-                ref: "User",
-                required: false,
-            },
-            name: {
-                type: String,
-                required: true,
-            },
-            rating: {
-                type: Number,
-                required: true,
-            },
-            comment: {
-                type: String,
-                required: true,
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now()
-            },
-            createdBy: {
-                type: Schema.Types.ObjectId
-            },
-            modifiedBy: {
-                type: Schema.Types.ObjectId
-            },
-            modifiedAt: {
-                type: Date,
-                default: Date.now()
-            },
-        },
-    ],
-    numOfReviews: {
-        type: Number,
-        default: 0,
-    },
-    ratings: {
-        type: Number,
-        default: 0,
+        default: moment().tz('Asia/Kolkata').format()
     },
 });
 

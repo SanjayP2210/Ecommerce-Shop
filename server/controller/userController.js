@@ -69,6 +69,18 @@ const updateUser = async (req, res, next) => {
     }
 };
 
+const updateUserTheme = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const themeColor = req.body.color;
+        const update = { ['themeColor']: themeColor };
+        const user = await userModel.updateOne({ _id: id }, { $set: update });
+        res.json({ message: "User Theme Update Successfully", user: user });
+    } catch (error) {
+        console.log("err in updateUserTheme", err);
+    }
+}
+
 const deleteUser = async (req, res, next) => {
     try {
         const id = req.params.id;
@@ -168,6 +180,7 @@ export {
     deleteUser,
     sendEmail,
     updatePassword,
+    updateUserTheme
     // getImage,
     // uploadImage,
     // deleteImage

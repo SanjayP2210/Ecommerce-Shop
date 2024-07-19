@@ -9,6 +9,9 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem, removeItem } from "../../reducers/cartReducer";
 import { setThemeAttributes } from "../../constants/utilities";
+import { toast } from "react-toastify";
+import apiService from "../../service/apiService";
+import { useEffect } from "react";
 
 const Navbar = () => {
   const {
@@ -24,9 +27,38 @@ const Navbar = () => {
   const dispatch = useDispatch();
   console.log("items", items);
 
-  //   function handleColorTheme(e) {
-  //     document.documentElement.setAttribute("data-color-theme", e);
-  //   }
+  useEffect(() => {
+    if (user?.themeColor === "light") {
+      setThemeAttributes("light", "light-logo", "dark-logo", "sun", "moon");
+    } else {
+      setThemeAttributes("dark", "dark-logo", "light-logo", "moon", "sun");
+    }
+  }, [user?.themeColor]);
+
+  const handleColorTheme = async(color) => {
+    try {
+      const response = await apiService.putRequest(`user/theme/${user?._id}`, {
+        color: color,
+      });
+      if(response?.isError){
+        toast.error("error while update theme", response?.message);
+      } else {
+        let loginData = JSON.parse(localStorage.getItem("loginUserData"));
+        if(color === 'light'){
+          setThemeAttributes("light","light-logo","dark-logo", "sun","moon");
+        } else {
+          setThemeAttributes("dark", "dark-logo", "light-logo", "moon", "sun");
+        }
+        loginData = {
+          ...loginData,
+          themeColor:color
+        };
+        localStorage.setItem("loginUserData", JSON.stringify(loginData));
+      }
+      } catch (error) {
+        toast.error('error while update theme',error);
+      }
+    }
 
   return (
     <>
@@ -295,13 +327,7 @@ const Navbar = () => {
                       href="javascript:void(0)"
                       onClick={(e) => {
                         e.preventDefault();
-                        setThemeAttributes(
-                          "dark",
-                          "dark-logo",
-                          "light-logo",
-                          "moon",
-                          "sun"
-                        );
+                        handleColorTheme('dark');
                       }}
                       style={{ padding: "0px" }}
                     >
@@ -315,13 +341,7 @@ const Navbar = () => {
                       href="javascript:void(0)"
                       onClick={(e) => {
                         e.preventDefault();
-                        setThemeAttributes(
-                          "light",
-                          "light-logo",
-                          "dark-logo",
-                          "sun",
-                          "moon"
-                        );
+                        handleColorTheme('light');
                       }}
                       style={{ display: "none" }}
                     >
@@ -1180,13 +1200,7 @@ const Navbar = () => {
                       href="javascript:void(0)"
                       onClick={(e) => {
                         e.preventDefault();
-                        setThemeAttributes(
-                          "dark",
-                          "dark-logo",
-                          "light-logo",
-                          "moon",
-                          "sun"
-                        );
+                        handleColorTheme('dark');
                       }}
                     >
                       <Icon
@@ -1204,13 +1218,7 @@ const Navbar = () => {
                       href="javascript:void(0)"
                       onClick={(e) => {
                         e.preventDefault();
-                        setThemeAttributes(
-                          "light",
-                          "light-logo",
-                          "dark-logo",
-                          "sun",
-                          "moon"
-                        );
+                        handleColorTheme('light')
                       }}
                     >
                       <Icon

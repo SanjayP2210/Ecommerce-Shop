@@ -37,7 +37,7 @@ const AddVariants = ({ setData, data }) => {
   const handleAddItem = () => {
     const updatedArray = [
       ...data,
-      { id: Date.now(), variantValue: "", variantType: "" },
+      { id: Date.now(), variantValue: "", variantType: "",_id:0 },
     ];
     setData(updatedArray);
   };

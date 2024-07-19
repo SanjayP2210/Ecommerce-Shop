@@ -6,6 +6,7 @@ import {
     updateUser,
     sendEmail,
     updatePassword,
+    updateUserTheme
 } from "../controller/userController.js";
 import authMiddleWare from "../middleware/auth-middle-ware.js";
 import { adminMiddleware } from "../middleware/admin-middleware.js";
@@ -37,4 +38,5 @@ router.post("/sendMail", sendEmail);
 router.post("/reset-password", updatePassword);
 router.post("/upload-image", uploadImages);
 router.delete("/delete-image/:public_id", deleteImages);
+router.put("/theme/:id", updateUserTheme);
 export default router;

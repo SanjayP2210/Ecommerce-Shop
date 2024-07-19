@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import { Schema, model } from 'mongoose';
 
 const CategorySchema = new Schema({
@@ -8,7 +9,7 @@ const CategorySchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     },
     createdBy: {
         type: Schema.Types.ObjectId
@@ -18,7 +19,7 @@ const CategorySchema = new Schema({
     },
     modifiedAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     },
     isActive: {
         type: Boolean,

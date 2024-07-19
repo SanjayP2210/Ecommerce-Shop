@@ -4,7 +4,7 @@ import Logo from "../../assets/images/logos/Logo.png";
 import FBIcon from "../../assets/images/svgs/facebook-icon.svg";
 import GoogleIcon from "../../assets/images/svgs/google-icon.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { getJWTToken, handleNumberValidation } from "../../constants/utilities";
+import { getJWTToken, handleNumberValidation, setThemeAttributes } from "../../constants/utilities";
 import { toast } from "react-toastify";
 import { loginUser, createUser } from "../../reducers/authReducer";
 import UploadImage from "../../components/UploadImage/UploadImage";
@@ -51,6 +51,11 @@ const Login = () => {
   useEffect(() => {
     if (!loading && isLoggedIn && loginUserData && token) {
       console.log("loginUserData", loginUserData);
+      if (loginUserData?.themeColor != 'light') {
+        setThemeAttributes("dark", "dark-logo", "light-logo", "moon", "sun");
+      } else {
+        setThemeAttributes("light", "light-logo", "dark-logo", "sun", "moon");
+      }
       resetForm();
       navigate("/");
     }
@@ -317,7 +322,7 @@ const Login = () => {
                                   className="btn btn-dark w-100 py-8 mb-4 rounded-1"
                                   type="submit"
                                 >
-                                  {!isLoginFlow ? "Sign Up" : "Sing In"}
+                                  {!isLoginFlow ? "Sign Up" : "Sign In"}
                                 </button>
                                 <div className="d-flex align-items-center">
                                   <p className="fs-12 mb-0 fw-medium">

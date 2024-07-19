@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import { Schema, model } from 'mongoose';
 
 const Status = Schema({
@@ -11,7 +12,7 @@ const Status = Schema({
     },
     modifiedAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     }
 });
 

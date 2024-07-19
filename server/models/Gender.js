@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import { Schema, model } from 'mongoose';
 
 const Gender = Schema({
@@ -5,7 +6,7 @@ const Gender = Schema({
     isActive: { type: Boolean, required: true, default: true },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     },
     createdBy: {
         type: Schema.Types.ObjectId
@@ -15,7 +16,7 @@ const Gender = Schema({
     },
     modifiedAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     }
 });
 

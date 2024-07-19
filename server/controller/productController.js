@@ -20,9 +20,9 @@ const addProduct = async (req, res) => {
             images,
             categories,
             status,
-            createdAt: Date.now(),
+            createdAt: moment().tz('Asia/Kolkata').format(),
             createdBy: req?.user?._id?.toString() || "66715d2df7321f79928501dd",
-            modifiedAt: Date.now(),
+            modifiedAt: moment().tz('Asia/Kolkata').format(),
             modifiedBy: req?.user?._id?.toString() || "66715d2df7321f79928501dd"
         };
         const newProduct = await Product.create(body);
@@ -226,7 +226,7 @@ const updateProduct = async (req, res) => {
             images,
             categories,
             status,
-            modifiedAt: Date.now(),
+            modifiedAt: moment().tz('Asia/Kolkata').format(),
             modifiedBy: req?.user?._id?.toString()
         };
         const updatedProduct = await res.product.save();

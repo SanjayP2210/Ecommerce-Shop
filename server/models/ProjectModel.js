@@ -9,7 +9,7 @@ const ProjectSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     },
     createdBy: {
         type: Schema.Types.ObjectId
@@ -19,7 +19,7 @@ const ProjectSchema = new Schema({
     },
     modifiedAt: {
         type: Date,
-        default: Date.now()
+        default : moment().tz('Asia/Kolkata').format()
     }
 });
 
