@@ -1,46 +1,88 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import apiService from '../service/apiService';
+
+export const getCart = createAsyncThunk('cart/getCart', async (params) => {
+    return await apiService.getRequest('cart');
+});
+
+export const addToCart = createAsyncThunk('cart/addToCart', async (data) => {
+    return await apiService.postRequest('cart/add-to-cart', data);
+});
+
+export const removeFromCart = createAsyncThunk('users/removeFromCart', async (productId) => {
+    return await apiService.deleteRequest(`cart/remove-from-cart/${productId}`);
+});
 
 const initialState = {
-    items: [],
+    cartItems: [],
+    isCartUpdated: false,
+    isDeleted: false,
     totalCount: 0,
     totalPrice: 0,
+    isLoading:true
 };
 
 const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addItem: (state, action) => {
-            const item = action.payload;
-            const existingItem = state.items.find((i) => i._id === item._id);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                state.items.push({ ...item, quantity: 1 });
-            }
-
-            state.totalCount += 1;
-            state.totalPrice += item.basePrice;
-
+        resetCartState: (state, action) => {
+            state.isCartUpdated = false;
+            state.isDeleted = false;
         },
-        removeItem: (state, action) => {
-            const itemId = action.payload;
-            const existingItem = state.items.find((i) => i._id === itemId);
-
-            if (existingItem) {
-                if (existingItem.quantity === 1) {
-                    state.items = state.items.filter((i) => i._id !== itemId);
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(getCart.fulfilled, (state, action) => {
+                if (action.payload.isError) return;
+                const { items, totalCount, totalPrice } = action.payload.cart;
+                state.cartItems = items;
+                state.totalCount = totalCount;
+                state.totalPrice = totalPrice;
+                console.log('cartItems:', state.cartItems);
+                state.isLoading = false;
+                localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+            })
+            .addCase(addToCart.fulfilled, (state, action) => {
+                if (action.payload.isError) return;
+                const { cart, productId } = action.payload;
+                const { item, totalCount, totalPrice } = cart;
+                const existItem = state.cartItems.find(x => x.productId === productId);
+                if (existItem) {
+                    state.cartItems = state.cartItems.map(x =>
+                        x.productId === existItem.productId ? item : x
+                    );
                 } else {
-                    existingItem.quantity -= 1;
+                    state.cartItems.push(item);
                 }
+                state.totalCount = totalCount;
+                state.totalPrice = totalPrice;
+                state.isCartUpdated = true;
+                state.isLoading = false;
+                localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+            })
+            .addCase(removeFromCart.fulfilled, (state, action) => {
+                if (action.payload.isError) return;
+                const { cart, productId } = action.payload;
+                const { totalCount, totalPrice } = cart;
+                const existingItem = state.cartItems.find(x => x.productId === productId);
 
-                state.totalCount -= 1;
-                state.totalPrice -= existingItem.basePrice;
-            }
-        },
+                if (existingItem) {
+                    if (existingItem.quantity === 1) {
+                        state.cartItems = state.cartItems.filter(x => x.productId !== productId);
+                    } else {
+                        existingItem.quantity -= 1;
+                    }
+                }
+                state.totalCount = totalCount;
+                state.totalPrice = totalPrice;
+                state.isLoading = false;
+                state.isDeleted = true;
+                console.log('cartItems:', state.cartItems);
+                localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+            });
     },
 });
 
-export const { addItem, removeItem } = cartSlice.actions;
+export const { resetCartState } = cartSlice.actions;
 export default cartSlice.reducer;

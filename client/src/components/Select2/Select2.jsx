@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useSelector } from "react-redux";
 import Select from "react-select";
+import { getThemeColor } from "../../constants/utilities";
 
 const Select2 = ({
   options,
@@ -10,126 +12,135 @@ const Select2 = ({
   isMultiple = false,
   placeholder,
   selectRef,
+  isCapitalRequired = true,
+  style,
+  optionStyle,
 }) => {
-  //   const options = [
-  //     { value: "option1", label: "Option 1" },
-  //     { value: "option2", label: "Option 2" },
-  //     { value: "option3", label: "Option 3" },
-  //     { value: "option4", label: "Option 4" },
-  //     { value: "option5", label: "Option 5" },
-  //   ];
-  //   useEffect(() => {
-  //     const $ = window.jQuery;
-  //     if ($ && $.fn && $.fn.select2) {
-  //       $(".select2").select2({
-  //         placeholder: "Select an option",
-  //         allowClear: true,
-  //         data: options?.map((option) => ({
-  //           id: option.value,
-  //           text: option.label,
-  //         })),
-  //       });
-  //       //   $(selectRef.current
+  const { loginUserData: user } = useSelector((state) => state.auth);
+  const capitalizeFirstLetter = (string) => {
+    return string ? string.charAt(0).toUpperCase() + string.slice(1) : "";
+  };
 
-  //       // Attach change event handler
-  //       $(".select2").on("click", function (e) {
-  //         if (onChangeEvent) {
-  //           onChangeEvent(e.target.value);
-  //         }
-  //       });
-  //     } else {
-  //       console.error("jQuery or Select2 is not loaded");
-  //     }
-
-  //     return () => {
-  //       if ($ && $.fn && $.fn.select2) {
-  //         // $(".select2").select2("destroy");
-  //       }
-  //     };
-  //     // Initialize Select2 on mount
-  //   }, [options]);
+  const customFormatOptionLabel = ({ label, value }) => (
+    <div>{isCapitalRequired ? capitalizeFirstLetter(label) : label}</div>
+  );
 
   const handleChange = (value) => {
     handleOnChange(value);
   };
 
-  const customStyles = {
-    control: (base) => ({
-      ...base,
-      minHeight: "38px",
-      borderRadius: "0.25rem",
-      borderColor: "#ced4da",
-      cursor: "pointer",
-      "&:hover": {
-        borderColor: "var(--bs-primary);",
-      },
-      boxShadow: "none",
-    }),
-    multiValue: (base) => ({
-      ...base,
-      backgroundColor: "var(--bs-primary);",
-      borderRadius: "8px",
-      borderColor: "var(--bs-primary);",
-      color: "#fff",
-    }),
-    multiValueLabel: (base) => ({
-      ...base,
-      color: "white",
-      backgroundColor: "var(--bs-primary);",
-      borderRadius: "8px",
-    }),
-    multiValueRemove: (base) => ({
-      ...base,
-      color: "#fff",
-      cursor: "pointer",
-      "&:hover": {
-        backgroundColor: "#d9534f",
-        color: "white",
-        borderRadius: "8px",
-      },
-    }),
-    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-      return {
-        ...styles,
-        backgroundColor: isDisabled ? null : "white",
-        color: "black",
-        cursor: isDisabled ? "not-allowed" : "pointer",
+  const customStyles = useMemo(() => {
+    const themeColor = getThemeColor() === "light" ? "black" : "white";
+    return {
+      control: (base) => ({
+        ...base,
+        minHeight: "38px",
+        minWidth: "30%",
+        borderRadius: "0.25rem",
+        backgroundColor: "var(--bs-body-bg)",
+        borderColor: getThemeColor() ? "#e0e6eb" : "#313e54",
+        cursor: "pointer",
         "&:hover": {
-          backgroundColor: isFocused ? "var(--bs-primary);" : "white",
+          borderColor: "var(--bs-primary);",
+        },
+        boxShadow: "none",
+        ...style,
+      }),
+      singleValue: (base) => ({
+        ...base,
+        color: themeColor,
+      }),
+      multiValue: (base) => ({
+        ...base,
+        backgroundColor: "var(--bs-primary);",
+        borderRadius: "8px",
+        color: "#fff",
+      }),
+      multiValueLabel: (base) => ({
+        ...base,
+        color: "white",
+        backgroundColor: "var(--bs-primary);",
+        borderRadius: "8px",
+      }),
+      multiValueRemove: (base) => ({
+        ...base,
+        color: "#fff",
+        cursor: "pointer",
+        "&:hover": {
+          backgroundColor: "#d9534f",
           color: "white",
+          borderRadius: "8px",
         },
-        ":active": {
-          ...styles[":active"],
-          backgroundColor: !isDisabled && (isSelected ? data.color : "var(--bs-primary);"),
-        },
-      };
-    },
-  };
+      }),
+      option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+        return {
+          ...styles,
+          cursor: isDisabled ? "not-allowed" : "pointer",
+          "&:hover": {
+            backgroundColor: isFocused
+              ? "var(--bs-primary)"
+              : "var(--bs-body-bg)",
+            color: "white",
+          },
+          ":active": {
+            ...styles[":active"],
+            color: "white",
+          },
+          color: themeColor,
+          backgroundColor: isSelected
+            ? "var(--bs-primary)"
+            : "var(--bs-body-bg)",
+          ...optionStyle,
+        };
+      },
+      menuList: (base) => ({
+        ...base,
+        backgroundColor: "var(--bs-body-bg)",
+      }),
+    };
+  }, [user?.themeColor]);
+
+  const finalValue = useMemo(() => {
+    let updateValue = value;
+    if (options?.length === 0) return null;
+    if (typeof value === "string" || typeof value === "number") {
+      updateValue = options?.filter(
+        (x) =>
+          x?.value?.toString()?.toLowerCase() ===
+          value?.toString()?.toLowerCase()
+      );
+    } else {
+      if (value && value?.length > 0) {
+        if (isMultiple) {
+          const isValueAvailable = value[0]?.value || false;
+          if (!isValueAvailable) {
+            updateValue = value?.map((x) => {
+              return {
+                value: x?._id,
+                label: x?.name,
+              };
+            });
+          } else {
+            updateValue = value;
+          }
+        } else {
+          updateValue = options?.filter((x) => x?.value === value?.[0]);
+        }
+      }
+    }
+    return updateValue;
+  }, [value, options]);
 
   return (
     <div>
-      {/* <select
-        id={id}
-        name={name}
-        required
-        // value={value}
-
-        style={{ width: "100%" }}
-        className="select2 form-control"
-        // multiple="multiple"
-      >
-        <option value="">Select an option</option>
-      </select> */}
-
-      {/* <br /> */}
       <Select
+        formatOptionLabel={customFormatOptionLabel}
         isClearable={true}
-        // isLoading={true}
         ref={selectRef}
         id={id}
         name={name}
         isMulti={isMultiple}
-        value={value}
+        value={finalValue}
         isSearchable={true}
         onChange={handleChange}
         options={options}

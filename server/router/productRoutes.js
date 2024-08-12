@@ -1,23 +1,28 @@
 import express from 'express';
-import { addProduct, updateProduct, deleteProduct, getProductById, getProducts, createProductReview, deleteReview, getProductReviews, filterByCategory, getProductForShop } from '../controller/productController.js';
+import { addProduct, updateProduct, deleteProduct, getProductById, getProducts, createProductReview, deleteReview, getProductReviews, filterByCategory, getProductForShop, getRelatedProducts, getMaxPriceOfProduct, getVariantsByFilter, getProductForEditById } from '../controller/productController.js';
 import Product from '../models/Product.js';
+import authMiddleWare from '../middleware/authMiddleware.js';
 const router = express.Router();
 
-router.get('/', getProducts)
-router.post('/', addProduct);
-router.get('/shop', getProductForShop);
-router.get('/:id', getProductById);
-router.put('/review', createProductReview);
-router.get('/review/:id', getProductReviews);
-router.delete('/review', deleteReview);
-router.put('/:id', getProduct, updateProduct);
-router.delete('/:id', getProduct, deleteProduct);
+router.get('/', authMiddleWare , getProducts)
+router.post('/', authMiddleWare , addProduct);
+router.get('/shop' , getProductForShop);
+router.get('/max-price', getMaxPriceOfProduct);
+router.get('/get-variant/:variant', getVariantsByFilter);
+router.put('/review', authMiddleWare , createProductReview);
+router.get('/review/:productId', getProductReviews);
+router.delete('/review', authMiddleWare , deleteReview);
 router.get('/category/:value', filterByCategory);
+router.get('/related/:productId', getRelatedProducts);
+router.get('/product-for-edit/:productId', authMiddleWare, getProductForEditById);
+router.get('/get-single-product/:productId', getProductById);
+router.put('/:productId', authMiddleWare , getProduct, updateProduct);
+router.delete('/:productId', authMiddleWare , getProduct, deleteProduct);
 
 async function getProduct(req, res, next) {
     let product;
     try {
-        product = await Product.findById(req.params.id);
+        product = await Product.findById(req.params.productId);
         if (product == null) {
             return res.status(404).json({ message: 'Product not found' });
         }

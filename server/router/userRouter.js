@@ -8,7 +8,7 @@ import {
     updatePassword,
     updateUserTheme
 } from "../controller/userController.js";
-import authMiddleWare from "../middleware/auth-middle-ware.js";
+import authMiddleWare from "../middleware/authMiddleware.js";
 import { adminMiddleware } from "../middleware/admin-middleware.js";
 import { uploadImages, deleteImages } from "../controller/commonController.js";
 const router = express.Router();

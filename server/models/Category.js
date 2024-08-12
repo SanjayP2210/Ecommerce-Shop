@@ -7,6 +7,11 @@ const CategorySchema = new Schema({
         required: true,
         unique: true
     },
+    icon: {
+        type: String,
+        // required: true,
+        // unique: true
+    },
     createdAt: {
         type: Date,
         default : moment().tz('Asia/Kolkata').format()

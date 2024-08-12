@@ -18,12 +18,10 @@ const OwlCarouselComponent = ({ images = [] }) => {
 
   const options1 = {
     items: 1,
-    slideSpeed: 2000,
     nav: false,
     autoplay: false,
     dots: true,
     loop: true,
-    rtl: true,
     responsiveRefreshRate: 200,
     navText: [
       '<svg width="12" height="12" height="100%" viewBox="0 0 11 20"><path style="fill:none;stroke-width: 3px;stroke: #fff;" d="M9.554,1.001l-8.607,8.607l8.607,8.606"/></svg>',
@@ -36,9 +34,7 @@ const OwlCarouselComponent = ({ images = [] }) => {
     margin: 16,
     dots: true,
     nav: false,
-    rtl: true,
     smartSpeed: 200,
-    slideSpeed: 500,
     slideBy: 4,
     responsiveRefreshRate: 100,
   };
@@ -69,6 +65,8 @@ const OwlCarouselComponent = ({ images = [] }) => {
         events={{
           onChanged: handleSync1Change,
         }}
+        data-slide-speed="2000"
+        rtl={"true"}
         className="owl-carousel owl-theme"
         {...options1}
       >
@@ -87,6 +85,8 @@ const OwlCarouselComponent = ({ images = [] }) => {
         id="sync2"
         className="thumbnail-carousel"
         ref={(carousel) => setSync2(carousel)}
+        data-slide-speed="500"
+        rtl={"true"}
         options={options2}
         events={{
           onChanged: handleSync2Change,

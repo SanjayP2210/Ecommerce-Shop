@@ -27,20 +27,18 @@ const [rangeArray, setRangeArray] = useState([]);
     }
   }, [min, max]);
 
-  console.log("maxRef.current", maxRef.current);
-
   useEffect(() => {
     if (minRef.current) {
       minRef.current.value = 0;
     }
     if (maxRef.current) {
-      maxRef.current.value = 1000;
+      maxRef.current.value = maxRef.current.value ? maxRef.current.value : max;
     }
   }, [minRef.current, maxRef.current]);
 
   const handleInputChange = (e, index) => {
     const newValue = [...rangeValue];
-    newValue[index] = parseFloat(e.target.value) || 0;
+    newValue[index] = parseInt(e.target.value) || 0;
     setRangeValue(newValue);
     if (sliderRef.current) {
       sliderRef.current.noUiSlider.set(newValue);
@@ -48,14 +46,14 @@ const [rangeArray, setRangeArray] = useState([]);
   };
 
   const onUpdate = (values) => {
-    setRangeValue(values.map((val) => parseFloat(val).toFixed(2)));
-    minRef.current.value = parseFloat(values[0]).toFixed(2);
-    maxRef.current.value = parseFloat(values[1]).toFixed(2);
+    setRangeValue(values.map((val) => parseInt(val)));
+    minRef.current.value = parseInt(values[0]);
+    maxRef.current.value = parseInt(values[1]);
   };
 
   return (
     <div className="range-slider">
-      {rangeArray?.length  > 0 && (
+      {rangeArray?.length > 0 && (
         <>
           <Nouislider
             start={rangeValue}
@@ -89,7 +87,7 @@ const [rangeArray, setRangeArray] = useState([]);
                 }
                 handleInputChange(e, 0);
               }}
-              maxLength={parseFloat(rangeValue[1])?.toString()?.length}
+              maxLength={parseInt(rangeValue[1])?.toString()?.length}
               max={maxRef?.current?.value}
             />
             <input
@@ -97,6 +95,7 @@ const [rangeArray, setRangeArray] = useState([]);
               className="form-group form-control ps-2"
               placeholder="0"
               ref={maxRef}
+              defaultValue={max}
               maxLength={max?.toString()?.length}
               onChange={handleNumberValidation}
               onBlur={(e) => {

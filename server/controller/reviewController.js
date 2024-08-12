@@ -1,37 +1,142 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-
 // Bring in Models & Helpers
-const Review = require('../../models/review');
-const Product = require('../../models/product');
-const auth = require('../../middleware/auth');
-const { REVIEW_STATUS } = require('../../constants');
+import Review from '../models/review.js';
+import Product from '../models/Product.js';
+import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
-router.post('/add', auth, async (req, res) => {
+const createReview = async (req, res) => {
     try {
-        const user = req.user;
+        const { rating, comment, productId } = req.body;
+        const product = await Product.findById(productId);
+        let productReviews = await Review.find({ product: productId });
+        const userId = req?.user?.id;
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
 
-        const review = new Review({
-            ...req.body,
-            user: user._id
+        const newReview = new Review({
+            user: userId,
+            product: productId,
+            name: req?.user?.name,
+            rating: Number(rating),
+            comment,
+            approved: true,
+            createdBy: userId,
+            modifiedBy: userId,
         });
 
-        const reviewDoc = await review.save();
+        const isReviewed = await productReviews.filter((rev) => {
+            if (rev.user?.toString() === userId?.toString()) {
+                return rev._id;
+            }
+        });
 
+        const review = await newReview.save();
+        if (isReviewed?.length > 0) {
+            const reviewId = isReviewed[0]['_id'];
+            const updatedReviewsId = product.reviews?.filter(rev => rev?.toString() != reviewId.toString());
+            const deletedReview = await Review.deleteOne({ _id: reviewId.toString() });
+            updatedReviewsId.push(review?._id);
+            product.reviews = updatedReviewsId;
+            productReviews = productReviews?.filter(rev => rev?._id?.toString() != reviewId.toString());
+        } else {
+            product.reviews.push(review?._id);
+            product.numOfReviews = product.reviews.length;
+        }
+        productReviews.push(review);
+        let avg = 0;
+
+        productReviews.forEach((rev) => {
+            avg += rev.rating;
+        });
+
+        product.ratings = parseFloat(avg / productReviews.length)?.toFixed(2);
+        const response = await product.save({ validateBeforeSave: false });
         res.status(200).json({
             success: true,
             message: `Your review has been added successfully and will appear when approved!`,
-            review: reviewDoc
+            newReview,
+            isError:false
         });
     } catch (error) {
         return res.status(400).json({
-            error: 'Your request could not be processed. Please try again.'
+            error: 'Error while adding review'
         });
     }
-});
+}
+
+// GET all reviews for a product
+const getProductReview = async (req, res) => {
+    try {
+        const productId = new mongoose.Types.ObjectId(req.params.productId);
+        const reviews = await Review.aggregate([
+            {
+                $match: { product: productId, approved:true }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user',
+                    foreignField: '_id',
+                    as: 'userDetails'
+                }
+            },
+            {
+                $unwind: '$productDetails'
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user',
+                    foreignField: '_id',
+                    as: 'userDetails'
+                }
+            },
+            {
+                $unwind: '$userDetails'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    comment: 1,
+                    rating: 1,
+                    createdAt:1,
+                    createdBy:1,
+                    modifiedBy:1,
+                    modifiedAt:1,
+                    productDetails:{
+                        numOfReviews:1,
+                        ratings: 1,
+                        _id: 1
+                    },
+                    userDetails: {
+                        image: 1,
+                        name: 1,
+                        _id : 1
+                    }
+                }
+            }
+        ]);
+        res.status(200).json({
+            reviews
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 // fetch all reviews api
-router.get('/', async (req, res) => {
+const getReviews = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
 
@@ -62,12 +167,12 @@ router.get('/', async (req, res) => {
             error: 'Your request could not be processed. Please try again.'
         });
     }
-});
+}
 
 router.get('/:slug', async (req, res) => {
     try {
         const productDoc = await Product.findOne({ slug: req.params.slug });
-
+        const status = req.body.status;
         const hasNoBrand =
             productDoc?.brand === null || productDoc?.brand?.isActive === false;
 
@@ -79,7 +184,7 @@ router.get('/:slug', async (req, res) => {
 
         const reviews = await Review.find({
             product: productDoc._id,
-            status: REVIEW_STATUS.Approved
+            status
         })
             .populate({
                 path: 'user',
@@ -97,7 +202,7 @@ router.get('/:slug', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+const getReviewById = async (req, res) => {
     try {
         const reviewId = req.params.id;
         const update = req.body;
@@ -116,16 +221,17 @@ router.put('/:id', async (req, res) => {
             error: 'Your request could not be processed. Please try again.'
         });
     }
-});
+};
 
 // approve review
-router.put('/approve/:reviewId', auth, async (req, res) => {
+const updateReview = async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
+        const status = req.body.status;
 
         const query = { _id: reviewId };
         const update = {
-            status: REVIEW_STATUS.Approved,
+            status,
             isActive: true
         };
 
@@ -141,46 +247,42 @@ router.put('/approve/:reviewId', auth, async (req, res) => {
             error: 'Your request could not be processed. Please try again.'
         });
     }
-});
+};
 
-// reject review
-router.put('/reject/:reviewId', auth, async (req, res) => {
+const deleteReview = async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
+        const reviewId = req.params.id;
+        const productId = req?.body?.productId;
+        let productReviews = await Review.find({ product: productId });
+        const product = await Product.findById(productId);
+        product.reviews = product.reviews.filter(rev => rev?.toString() != reviewId?.toString());
+        product.numOfReviews = product.reviews.length;
+        productReviews = productReviews?.filter(rev => rev?._id?.toString() != reviewId.toString());
+        let avg = 0;
 
-        const query = { _id: reviewId };
-        const update = {
-            status: REVIEW_STATUS.Rejected
-        };
-
-        await Review.findOneAndUpdate(query, update, {
-            new: true
+        productReviews.forEach((rev) => {
+            avg += rev.rating;
         });
-
-        res.status(200).json({
-            success: true
-        });
-    } catch (error) {
-        res.status(400).json({
-            error: 'Your request could not be processed. Please try again.'
-        });
-    }
-});
-
-router.delete('/delete/:id', async (req, res) => {
-    try {
-        const review = await Review.deleteOne({ _id: req.params.id });
-
+        const deletedReview = await Review.deleteOne({ _id: reviewId });
+        product.ratings = productReviews.length === 0 ? 0 : parseFloat(avg / productReviews.length)?.toFixed(2);
+        const response = await product.save({ validateBeforeSave: false });
         res.status(200).json({
             success: true,
             message: `review has been deleted successfully!`,
-            review
+            review: deletedReview
         });
     } catch (error) {
         return res.status(400).json({
             error: 'Your request could not be processed. Please try again.'
         });
     }
-});
+};
 
-module.exports = router;
+export {
+    createReview,
+    updateReview,
+    getReviewById,
+    getReviews,
+    deleteReview,
+    getProductReview
+}

@@ -5,7 +5,6 @@ const productSchema = new Schema({
     productName: { type: String, required: true },
     taxClass: { type: String, required: true },
     vatAmount: { type: String, required: true },
-    basePrice: { type: Number, required: true },
     categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
     gender: [{ type: Schema.Types.ObjectId, ref: 'Gender' }],
     tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
@@ -24,7 +23,6 @@ const productSchema = new Schema({
         public_id: String,
         url: String
     }],
-    discountType: { type: String, required: true },
     stock: {
         type: Number,
         required: [true, "Please Enter product Stock"],
@@ -40,6 +38,10 @@ const productSchema = new Schema({
         type: Number,
         default: 0,
     },
+    basePrice: { type: Number, required: true },
+    discountType: { type: String, enum: ['no_discount', 'percentage', 'fixed_price'], required: true },
+    discountValue: { type: Number, required: true },
+    updatedPrice: { type: Number },
     createdAt: {
         type: Date,
         default: moment().tz('Asia/Kolkata').format()
@@ -56,6 +58,33 @@ const productSchema = new Schema({
     },
 });
 
-const Product = model('Product', productSchema);
+/**
+ * Calculate updated price based on discount type and value
+ * 
+ * @param {number} originalPrice - The original price of the product
+ * @param {string} discountType - The type of discount ('percentage' or 'fixed')
+ * @param {number} discountValue - The value of the discount
+ * @returns {number} - The updated price after applying the discount
+ */
+const calculateDiscountedPrice = (originalPrice, discountType, discountValue) => {
+    if (discountType === 'percentage') {
+        const discountAmount = (originalPrice * discountValue) / 100;
+        return originalPrice - discountAmount;
+    } else if (discountType === 'fixed_price') {
+        return originalPrice - discountValue;
+    } else {
+        return originalPrice;
+    }
+};
 
+
+productSchema.methods.applyDiscount = function () {
+    try {
+        this.updatedPrice = calculateDiscountedPrice(this.basePrice, this.discountType, this.discountValue);
+    } catch (error) {
+        console.log('error calculating',error);
+    }
+};
+
+const Product = model('Product', productSchema);
 export default Product;

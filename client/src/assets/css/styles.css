@@ -1,6 +1,7 @@
 @charset "UTF-8";
 @import url(https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap);
 @import  '../css/calendar.css';
+@import '../css/wizard.css';
 @import  '../css/checkout.css';
 @import  '../css/css-bar.css';
 @import  '../css/dark-bs.css';
@@ -12,7 +13,7 @@
 @import  '../css/simplebar.css';
 @import  '../css/tabler-icon.css';
 @import  '../css/toastr.css';
-@import  '../css/wizard.css';
+
 /* @import  '../css/range-slider.css'; */
 
 
@@ -17546,39 +17547,6 @@ h6 {
     }
 }
 
-.shop-part .shop-filters {
-    width: 250px
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item {
-    width: 24px;
-    height: 24px
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item.shop-colors-2 {
-    background-color: var(--bs-secondary)
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item.shop-colors-3 {
-    background-color: var(--bs-danger)
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item.shop-colors-4 {
-    background-color: var(--bs-warning)
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item.shop-colors-5 {
-    background-color: var(--bs-success)
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item.shop-colors-6 {
-    background-color: #000
-}
-
-.shop-part .shop-filters .by-colors .shop-color-list .shop-colors-item.shop-colors-7 {
-    background-color: pink
-}
-
 .circle-top {
     top: -33%;
     left: -14%;
@@ -17604,8 +17572,9 @@ h6 {
     max-width: 460px !important
 }
 
-.uploaded_file_view {
-    max-width: 60px;
+.drop_zone_file_view {
+    /* max-width: 60px; */
+    opacity:1;
     margin: 0 auto;
     text-align: center;
     position: relative;
@@ -17627,7 +17596,7 @@ h6 {
     color: #fff;
     font-size: 12px;
     cursor: pointer;
-    right: -15px;
+    right: 0px;
     top: -15px;
     transition: background .2s
 }
@@ -17658,4 +17627,8 @@ h6 {
   overflow: hidden;             /* Hides overflowed text */
   text-overflow: ellipsis;
 min-height: 45px;
+}
+
+.error-msg {
+   color: rgba(var(--bs-danger-rgb), var(--bs-text-opacity)) !important;
 }

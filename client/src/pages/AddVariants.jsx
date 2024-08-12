@@ -3,29 +3,22 @@ import Select2 from "../components/Select2/Select2";
 import apiService from "../service/apiService";
 
 const AddVariants = ({ setData, data }) => {
-  const [variantTypeList, setVariantTypeList] = useState(
-    [] || [
-      { value: "color", label: "Color" },
-      { value: "size", label: "Size" },
-      { value: "material", label: "Material" },
-      { value: "style", label: "Style" },
-    ]
-  );
+  const [variantTypeList, setVariantTypeList] = useState([]);
 
    const fetchVariantType = async () => {
      try {
        const response = await apiService.getRequest("variant");
        if (response) {
-         const filteredStatus = response?.variant?.map((data) => {
+         const filteredVarinat = response?.variant?.map((data) => {
            return {
-             value: data?.name,
-             label: data?.name[0]?.toUpperCase() + data?.name.slice(1),
+             value: data?._id,
+             label: data?.name,
            };
          });
-         console.log("filteredStatus", filteredStatus);
-         setVariantTypeList(filteredStatus);
+         console.log("filteredVarinat", filteredVarinat);
+         setVariantTypeList(filteredVarinat);
        }
-     } catch (error) {
+     } catch (error) { 
        console.log("error", error);
      }
    };
@@ -37,7 +30,7 @@ const AddVariants = ({ setData, data }) => {
   const handleAddItem = () => {
     const updatedArray = [
       ...data,
-      { id: Date.now(), variantValue: "", variantType: "",_id:0 },
+      { id: Date.now(), value: "", label: "",_id:0 },
     ];
     setData(updatedArray);
   };
@@ -47,62 +40,120 @@ const AddVariants = ({ setData, data }) => {
     setData(updatedArray);
   };
 
+  const setColorInputValue = (e,id,value) => { 
+    const inputColorEle = document.getElementById(`input-color-${id}`);
+    if (inputColorEle) {
+      inputColorEle.value = value;
+    }
+  }
+
   const handleChange = (name, id, newValue) => {
     const value = newValue;
-    const updatedArray = data.map((item) =>
-      item?.id === id ? { ...item, [name]: value } : item
-    );
+    let updatedArray = [];
+    if (name === 'label' && !value) {
+      updatedArray = data.map((item) =>
+        item?.id === id ? { ...item, value: "", label: "" } : item
+      );
+    } else {
+      updatedArray = data.map((item) =>
+        item?.id === id ? { ...item, [name]: value } : item
+      );
+    }
     setData(updatedArray);
   };
+
+  const handleColorInputChange = (id, e) => {
+    const newValue = e.target.value;
+    if (/^#[0-9A-F]{6}$/i.test(newValue)) {
+      handleChange("value", id, newValue);
+    } else {
+        const inputColorEle = document.getElementById(`color-${id}`);
+    if (inputColorEle) {
+       e.target.value= inputColorEle.value;
+    }
+    }
+  };
+
 
   return (
     <div>
       <div className="mb-3">
-        {data?.map((item, index) => (
-          <div key={item?.id} className="repeater-item">
-            <div className="row mb-3">
-              <div className="col-md-4">
-                <Select2
-                  id={`${item?.id}-variantType`}
-                  name={`${item?.id}-variantType`}
-                  value={item?.variantType}
-                  isMultiple={false}
-                  handleOnChange={(value) => {
-                    handleChange("variantType", item?.id, value);
-                  }}
-                  options={variantTypeList}
-                  placeholder={"Select Variation"}
-                />
+        {data?.map((item, index) => {
+          const selectData = variantTypeList.filter((x) => x.value === item.label);
+            return (
+              <div key={item?.id} className="repeater-item">
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <Select2
+                      id={`${item?.id}-label`}
+                      name={`${item?.id}-label`}
+                      value={item?.label === "" ? null : item?.label}
+                      isMultiple={false}
+                      handleOnChange={(value) => {
+                        handleChange("label", item?.id, value?.value);
+                      }}
+                      options={variantTypeList}
+                      placeholder={"Select Variation"}
+                    />
+                  </div>
+                  <div className="col-md-4 mt-3 mt-md-0">
+                    {selectData[0]?.label === "color" ? (
+                      <div className="input-group mb-3">
+                        <input
+                          type="color"
+                          style={{ maxWidth: "50px" }}
+                          className="form-control form-control-color"
+                          value={item?.value}
+                          name="value"
+                          id={`color-${item.id}`}
+                          onChange={(e) => {
+                            handleChange("value", item?.id, e.target.value);
+                            setColorInputValue(item?.id, e.target.value);
+                          }}
+                        />
+                        <input
+                          type="text"
+                          className="form-control"
+                          defaultValue={item?.value}
+                          id={`input-color-${item.id}`}
+                          name="value-color"
+                          onBlur={(e) => handleColorInputChange(item?.id, e)}
+                        />
+
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                        >
+                          Ok
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={item?.value}
+                        name="value"
+                        onChange={(e) =>
+                          handleChange("value", item?.id, e.target.value)
+                        }
+                      />
+                    )}
+                  </div>
+                  <div className="col-md-2 mt-3 mt-md-0">
+                    {data?.length > 1 && (
+                      <button
+                        className="btn bg-danger-subtle text-danger"
+                        type="button"
+                        onClick={() => handleRemoveItem(item?.id)}
+                      >
+                        <i className="ti ti-x fs-5 d-flex"></i>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="col-md-4 mt-3 mt-md-0">
-                <input
-                  type={item?.variantType?.value === "color" ? "color" : "text"}
-                  className={`form-control ${
-                    item?.variantType?.value === "color"
-                      ? "form-control-color"
-                      : ""
-                  }`}
-                  value={item?.variantValue}
-                  name="variantValue"
-                  onChange={(e) =>
-                    handleChange("variantValue", item?.id, e.target.value)
-                  }
-                />
-              </div>
-              <div className="col-md-2 mt-3 mt-md-0">
-                {data?.length > 1 && (
-                  <button
-                    className="btn bg-danger-subtle text-danger"
-                    type="button"
-                    onClick={() => handleRemoveItem(item?.id)}
-                  >
-                    <i className="ti ti-x fs-5 d-flex"></i>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+            );
+        })}
         <button
           type="button"
           className="btn bg-primary-subtle text-primary "

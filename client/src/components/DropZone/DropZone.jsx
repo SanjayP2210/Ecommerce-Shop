@@ -9,19 +9,44 @@ import React, {
 import { useDropzone } from "react-dropzone";
 import { toast } from "react-toastify";
 import apiService from "../../service/apiService";
+import "./index.css";
 
-const DropzoneComponent = ({ id, maxFiles, setFiles, files=[], height,style }) => {
+const DropzoneComponent = ({
+  id,
+  maxFiles,
+  setFiles,
+  files = [],
+  height,
+  style,
+  data,
+  name
+}) => {
   const [loading, setLoading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [previewImage, setPreviewImage] = useState([]);
   console.log("files", files);
 
+  // useEffect(() => {
+  //   if (files?.length > 0) {
+  //     setPreviewImage(files);
+  //   }
+  // }, [files]);
+
   useEffect(() => {
-    if (files?.length > 0) {
-      setPreviewImage(files);
+    if (data?.[name] && data?.[name]?.length > 0) {
+      // if (data?.image[0]?.url?.length > 0) {
+      const imageList = data?.[name];
+      setPreviewImage(imageList);
+      // } else {
+      //   setPreviewImage(
+      //     data?.image?.url && data?.image?.url?.includes("res.cloudinary.com")
+      //       ? [data?.image?.url]
+      //       : []
+      //   );
+      // }
     }
-  }, [files]);
+  }, [data?.[name]]);
 
   //   useEffect(() => {
   //     const $ = window.jQuery;
@@ -114,7 +139,6 @@ const DropzoneComponent = ({ id, maxFiles, setFiles, files=[], height,style }) =
       });
 
       if (isError) return;
-      //uplaod file formula
       setLoading(true);
       setError(null);
       setUploadSuccess(false);
@@ -123,24 +147,35 @@ const DropzoneComponent = ({ id, maxFiles, setFiles, files=[], height,style }) =
         formData.append(`files[${i}]`, acceptedFiles[i]);
       }
 
-      const response = await apiService.postRequest(
-        "user/upload-image",
-        formData
-      );
-      if (response?.isError) {
-        setError("Failed to upload files");
-        setLoading(false);
-        setUploadSuccess(false);
-      } else {
-        console.log("Success:", response);
-        // setPreviewImage(updatedImage);
-        setPreviewImage((prevFiles) => {
-          return prevFiles.concat([...(response?.images || [])]);
-        });
-        setFiles((prevFiles) => {
-          return prevFiles.concat([...(response?.images || [])]);
-        });
-      }
+      setFiles((prevFiles) => {
+        return prevFiles.concat([...(acceptedFiles || [])]);
+      });
+      const filePreviews = acceptedFiles.map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+      setPreviewImage((prevFiles) => {
+        return prevFiles.concat([...(filePreviews || [])]);
+      });
+
+      // const response = await apiService.postRequest(
+      //   "user/upload-image",
+      //   formData
+      // );
+      // if (response?.isError) {
+      //   setError("Failed to upload files");
+      //   setLoading(false);
+      //   setUploadSuccess(false);
+      // } else {
+      //   console.log("Success:", response);
+      //   // setPreviewImage(updatedImage);
+      //   setPreviewImage((prevFiles) => {
+      //     return prevFiles.concat([...(response?.images || [])]);
+      //   });
+      //   setFiles((prevFiles) => {
+      //     return prevFiles.concat([...(response?.images || [])]);
+      //   });
+      // }
       setLoading(false);
       setUploadSuccess(true);
       setTimeout(() => {
@@ -181,15 +216,18 @@ const DropzoneComponent = ({ id, maxFiles, setFiles, files=[], height,style }) =
 
   const removeImage = async (e, index, file) => {
     e.preventDefault();
-    const public_id = file?.public_id;
-    const response = await apiService.deleteRequest(
-      `user/delete-image/${public_id}`
-    );
-    if (response?.result?.result === "ok" && !response?.isError) {
-      const updatedImage = files.filter((x, i) => i != index);
-      setPreviewImage(updatedImage);
-      setFiles(updatedImage);
-    }
+    // const public_id = file?.public_id;
+    // const response = await apiService.deleteRequest(
+    //   `user/delete-image/${public_id}`
+    // );
+    // if (response?.result?.result === "ok" && !response?.isError) {
+    const updatedImage = files.filter((x, i) => i != index);
+    setPreviewImage(updatedImage);
+    setFiles(updatedImage);
+    //  const formData = new FormData();
+    //  for (let i = 0; i < acceptedFiles.length; i++) {
+    //    formData.append(`files[${i}]`, acceptedFiles[i]);
+    //  }
   };
 
   const thumbs = useMemo(
@@ -197,27 +235,25 @@ const DropzoneComponent = ({ id, maxFiles, setFiles, files=[], height,style }) =
       previewImage?.map((file, index) => (
         <>
           <div
-            className={`col-md-4 uploaded_file_view ${file?.url ? "show" : ""}`}
+            className={`col-4 ps-0 m-3`}
             key={index}
+            style={{ maxWidth: "100px" }}
           >
-            <span
-              className="file_remove"
-              onClick={(e) => {
-                removeImage(e, index, file);
-              }}
-            >
-              X
-            </span>
-            <div className="card overflow-hidden">
-              <div className="col-12 ps-0">
-                <div className="position-relative w-100 h-100">
-                  <img
-                    src={file?.url}
-                    alt={"user image"}
-                    className="w-100 rounded-0"
-                    style={{ height: "57px"}}
-                  />
-                </div>
+            <div className="position-relative w-100 h-100">
+              <span
+                // className="file_remove"
+                onClick={(e) => {
+                  removeImage(e, index, file);
+                }}
+              >
+                <i className="ti ti-x fill-white file-remove-icon"></i>
+              </span>
+              <div className="file-image-view">
+                <img
+                  src={file?.url || file?.preview}
+                  alt={"user image"}
+                  className="w-100 rounded-0"
+                />
               </div>
             </div>
           </div>
@@ -265,37 +301,67 @@ const DropzoneComponent = ({ id, maxFiles, setFiles, files=[], height,style }) =
 
   return (
     <div className="container">
-      <div
-        style={{
-          display: loading ? "none" : "flex",
-          cursor: "pointer",
-          minHeight: height,
-          ...style 
-        }}
-        id={`${id}-dropzone`}
-        {...getRootProps({
-          className: "dropzone",
-          ariaDisabled: maxFiles >= files?.length,
-        })}
-      >
-        <input className="dz-button" {...getInputProps()} />
-        {isDragActive ? (
-          <p>Drop the files here ...</p>
-        ) : (
-          <p>Drag and drop file here, or click to select</p>
+      <div className="row el-element-overlay">
+        {previewImage?.length >= maxFiles ? null : (
+          <>
+            <div
+              className={`${
+                previewImage?.length === 0 || maxFiles === 1
+                  ? "col-md-12"
+                  : "col-md-4"
+              }`}
+            >
+              <div
+                style={{
+                  display: loading ? "none" : "flex",
+                  cursor: "pointer",
+                  minHeight: height,
+                  width:
+                    maxFiles === 1
+                      ? previewImage?.length > 0
+                        ? "200px"
+                        : "auto"
+                      : "auto",
+                  ...style,
+                }}
+                id={`${id}-dropzone`}
+                {...getRootProps({
+                  className: "dropzone",
+                  ariaDisabled: maxFiles >= files?.length,
+                })}
+              >
+                <input className="dz-button" {...getInputProps()} />
+                {isDragActive ? (
+                  <p>Drop the files here ...</p>
+                ) : (
+                  <p>Drag and drop file here, or click to select</p>
+                )}
+              </div>
+              {loading && (
+                <div
+                  className="dropzone d-flex justify-content-center align-items-center mt-3"
+                  style={{ color: "black" }}
+                >
+                  <div className="spinner-border" role="status"></div>
+                  <span style={{ marginLeft: "10px" }}>
+                    {"   "} Uploading...
+                  </span>
+                </div>
+              )}{" "}
+            </div>
+          </>
         )}
-      </div>
-      {loading && (
         <div
-          className="dropzone d-flex justify-content-center align-items-center mt-3"
-          style={{ color: "black" }}
+          className={`${
+            previewImage?.length >= maxFiles
+              ? "col-md-12 justify-content-center"
+              : "col-md-8 scrollbar"
+          } d-flex view-box`}
+          id="style-7"
         >
-          <div className="spinner-border" role="status"></div>
-          <span style={{ marginLeft: "10px" }}>{"   "} Uploading...</span>
+          {thumbs}
         </div>
-      )}
-      <br />
-      <div className="row el-element-overlay">{thumbs}</div>
+      </div>
 
       {!loading && uploadSuccess && (
         <div className="alert alert-success mt-3" role="alert">

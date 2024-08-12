@@ -6,12 +6,12 @@ const Variant = Schema({
     isActive: { type: Boolean, required: true, default: true },
     createdBy: {
          type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref:'user',
         required: true
     },
     modifiedBy: {
          type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref:'user',
         required: true
     },
     modifiedAt: {

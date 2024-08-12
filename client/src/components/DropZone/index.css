@@ -1,0 +1,65 @@
+.file-remove-icon {
+    position: absolute;
+    background: #ffffff61;
+    color: black;
+    top: -11px;
+    right: -8px;
+    font-weight: 500;
+    font-size: 20px;
+    border-radius: 10px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.single-file-upload{
+    width:auto !important;
+}
+
+.view-box {
+    scroll-behavior: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.view-box img {
+    display: inline-block;
+    margin-right: 10px;
+    height: 80px;
+    max-width: 150px
+}
+
+.file-image-view {
+    max-width: 100px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    transition: 0.2s;
+    opacity: 1;
+    border: 2px solid #ddd;
+    padding: 12px;
+    background: #f1f8f91c;
+}
+
+#style-7::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #F5F5F5;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#style-7::-webkit-scrollbar {
+    height: 5px;
+    background-color: #F5F5F5;
+    cursor: pointer;
+}
+
+#style-7::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    cursor: pointer;
+    background-image: -webkit-gradient(linear,
+            left bottom,
+            left top,
+            color-stop(0.44, rgb(122, 153, 217)),
+            color-stop(0.72, rgb(73, 125, 189)),
+            color-stop(0.86, rgb(28, 58, 148)));
+}

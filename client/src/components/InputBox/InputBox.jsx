@@ -6,7 +6,7 @@ const ErrorMsg = ({ inputName, errors }) => (
   <>
     {errors[inputName] && (
       <div style={{ textAlign: "right" }}>
-        <small className="text-danger form-label">
+        <small className="text-danger form-label error-msg">
           {errors[inputName]["message"]
             ? errors[inputName]["message"]
             : `${inputName} is required`}
@@ -36,6 +36,7 @@ const InputBox = ({
     formState: { errors },
     setValue,
   } = useFormContext();
+  console.log("error", errors);
 
   const { iconClassName, iconClick } = inputGroupProps;
 
@@ -49,6 +50,7 @@ const InputBox = ({
           className={className}
           autoComplete="off"
           name={name}
+          maxLength={maxLength}
           {...register(name, validation, {
             required: true,
           })}
@@ -59,11 +61,11 @@ const InputBox = ({
   };
   return (
     <>
-      {inputGroupProps ? (
+      {Object.entries(inputGroupProps)?.length > 0 ? (
         <>
           {label && (
             <label htmlFor={name} className="form-label">
-              {label}
+              {label} <span className="text-danger">*</span>
             </label>
           )}{" "}
           <div className="input-group border rounded-1">
@@ -82,7 +84,7 @@ const InputBox = ({
         <>
           {label && (
             <label htmlFor={name} className="form-label">
-              {label}
+              {label} <span className="text-danger">*</span>
             </label>
           )}{" "}
           {inputElement()}

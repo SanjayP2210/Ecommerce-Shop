@@ -5,14 +5,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import fs from 'fs';
 
-const getAll = (Model, controllerName) => async (req, res, next,) => {
+const getAll = (Model, controllerName) => async (req, res) => {
     try {
         const type = req.params.type;
         let list = [];
         if (type !== 'master') {
-            list = await Model.find({}, { name: 1 });
+            list = await Model.find({ isActive: true }, { name: 1, icon: 1 });
         } else {
-          list= await Model.find(type != 'master' ? { isActive: true } : {});
+          list= await Model.find({});
         }
         console.log('Model', Model)
         res.status(200).send({ [controllerName?.toLowerCase()]: list });
@@ -170,9 +170,9 @@ const handleImageUpload = async (req, res, image, public_id) => {
     }
 }
 
-const uploadImages = async (req, res, next) => {
+const uploadImages = async (req, res, filesList) => {
     try {
-        const files = req.files;
+        const files = filesList || req.files;
         if (!files || Object.keys(files)?.length === 0) {
             return res.status(400).send('No files were uploaded.');
         }
@@ -180,7 +180,7 @@ const uploadImages = async (req, res, next) => {
         const uploadPromises = Object.keys(files).map(newFile => {
             return new Promise((resolve, reject) => {
                 const file = files[newFile];
-                const tempFilePath = path.join(__dirname, 'uploads', file.name);
+                const tempFilePath = path.join(__dirname, 'uploads', file?.name);
                 file.mv(tempFilePath, async (err) => {
                     if (err) {
                         return res.status(500).send(err);
@@ -221,7 +221,11 @@ const uploadImages = async (req, res, next) => {
             });
         });
         const results = await Promise.all(uploadPromises);
-        res.send({ message: 'Images uploaded successfully', images: results });
+        if (filesList) {
+            return results;
+        } else {
+            res.send({ message: 'Images uploaded successfully', images: results });
+        }
 
     } catch (error) {
         res.status(400).json({ message: 'Error while uploadImages', error: error, isError: true });
@@ -251,5 +255,5 @@ export {
     deleteImage,
     handleImageUpload,
     uploadImages,
-    deleteImages
+    deleteImages,
 }

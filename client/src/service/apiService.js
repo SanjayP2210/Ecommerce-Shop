@@ -62,7 +62,7 @@ const apiService = {
     postRequest: (endpoint, payload) => apiRequest(endpoint, 'POST', payload),
     putRequest: (endpoint, payload) => apiRequest(endpoint, 'PUT', payload),
     patchRequest: (endpoint, payload) => apiRequest(endpoint, 'PATCH', payload),
-    deleteRequest: (endpoint) => apiRequest(endpoint, 'DELETE', null),
+    deleteRequest: (endpoint, payload) => apiRequest(endpoint, 'DELETE', payload),
 };
 
 export default apiService;

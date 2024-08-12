@@ -9,12 +9,12 @@ const PriceSortBy = ({ handleSortBy, sortBy, sortOrder }) => {
     },
     {
       icon: "ti ti-sort-ascending-2",
-      value: { field: "basePrice", order: "desc" },
+      value: { field: "updatedPrice", order: "desc" },
       label: "Price: High-Low",
     },
     {
       icon: "ti ti-sort-descending-2",
-      value: { field: "basePrice", order: "asc" },
+      value: { field: "updatedPrice", order: "asc" },
       label: "Price: Low-High",
     },
     // {
@@ -25,10 +25,10 @@ const PriceSortBy = ({ handleSortBy, sortBy, sortOrder }) => {
   ]);
   return (
     <>
-      {sortByList?.map((sort) => {
+      {sortByList?.map((sort,index) => {
         return (
           <>
-            <li className="list-group-item border-0 p-0 mx-4 mb-2">
+            <li key={index} className="list-group-item border-0 p-0 mx-4 mb-2">
               <a
                 className={`d-flex align-items-center gap-6 list-group-item-action text-dark px-3 py-6 rounded-1 sort-by-list-item-action 
                           cursor-pointer ${

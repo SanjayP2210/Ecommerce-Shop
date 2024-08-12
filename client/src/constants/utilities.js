@@ -1,4 +1,7 @@
-let keysToRemove = ["token", "loginUserData"];
+import React from "react";
+import { Slide, toast } from "react-toastify";
+
+let keysToRemove = ["token", "loginUserData", "selectedAddress","cartItems"];
 
 export const getJWTToken = () => localStorage.getItem('token');
 export let authorizationToken = `Bearer ${getJWTToken()}`;
@@ -18,6 +21,7 @@ export const storeTokenInLS = (serverToken) => {
 };
 
 const clearLocalStorage = () => {
+    localStorage.removeItem("selectedAddress");
     for (let key of keysToRemove) {
         localStorage.removeItem(key);
     }
@@ -27,6 +31,10 @@ export const LogoutUser = () => {
     return clearLocalStorage();
 };
 
+export const getThemeColor = () => {
+    const user = localStorage.getItem("loginUserData") ? JSON.parse(localStorage.getItem("loginUserData")) : {};
+    return user && user.themeColor ? user.themeColor : null;
+}
 
 export const checkPassword = (password) => {
     const strength = {
@@ -67,7 +75,6 @@ export const checkPassword = (password) => {
 
 }
 
-
 /**
  * only allow number with maxlength
  * @param {*} e input element
@@ -107,17 +114,34 @@ const  setThemeAttributes = (
         .forEach((el) => (el.style.display = "flex"));
 }
 
+export const addToCartInfoToast = () => {
+    toast.info(
+        "Item added to cart!",
+        {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            closeButton: false,
+            theme: "colored",
+            icon: React.createElement(
+                'span',
+                { className: 'fs-6 text-center' },
+                React.createElement('i', { className: 'ti ti-circle-check' })
+            ),
+            className: "custom-toast",
+            style: {
+                backgroundColor: "#635BFF",
+                color: "white",
+                fontSize: "1rem",
+            },
+            toastId: "unique-toast-id",
+            transition: Slide,
+        }
+    );
+}
+
 export { handleNumberValidation, setThemeAttributes };
-
-
-// document.querySelectorAll(".dark-layout").forEach((element) => {
-//     element.addEventListener("click", () =>
-//         setThemeAttributes("dark", "dark-logo", "light-logo", "moon", "sun")
-//     );
-// });
-
-// document.querySelectorAll(".light-layout").forEach((element) => {
-//     element.addEventListener("click", () =>
-//         setThemeAttributes("light", "light-logo", "dark-logo", "sun", "moon")
-//     );
-// });

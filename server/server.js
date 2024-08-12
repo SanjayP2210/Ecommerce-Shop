@@ -18,6 +18,10 @@ import tagRouter from './router/tagRouter.js';
 import statusRouter from './router/statusRouter.js';
 import variantRouter from './router/variantRouter.js';
 import GenderRouter from './router/genderRouter.js';
+import ReviewRouter from './router/reviewRouter.js';
+import cartRouter from './router/cartRouter.js';
+import orderRouter from './router/orderRouter.js';
+import addressRouter from './router/addressRouter.js';
 import errorMiddleware from './middleware/error.js';
 import connectDatabase from './config/db.js';
 
@@ -55,6 +59,10 @@ app.use('/api/tag', tagRouter);
 app.use('/api/status', statusRouter);
 app.use('/api/variant', variantRouter);
 app.use('/api/gender', GenderRouter);
+app.use('/api/review', ReviewRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/orders', orderRouter);
+app.use('/api/address', addressRouter);
 app.use(errorMiddleware);
 
 app.get("*", (req, res) => {

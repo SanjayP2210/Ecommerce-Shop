@@ -80,3 +80,9 @@
     padding: var(--bs-toast-padding-x);
     word-wrap: break-word;
 }
+
+.center-item{
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}

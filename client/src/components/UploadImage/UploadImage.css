@@ -1,7 +1,7 @@
 .image-container {
     max-width: 1100px;
     margin: 0 auto;
-}
+
 
 .panel {
     margin: 15px auto;
@@ -140,4 +140,6 @@
 .error_msg {
     text-align: center;
     color: #f00;
+}
+
 }

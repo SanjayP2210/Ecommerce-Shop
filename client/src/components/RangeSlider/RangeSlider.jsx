@@ -24,7 +24,7 @@ export const RangeSlider = ({
     }
   }, [min, max]);
 
-  const sliderRef = useRef(null);
+  const sliderRef = useRef();
 
   // useEffect(() => {
   //   const range = rangeRef?.current;
@@ -61,22 +61,25 @@ export const RangeSlider = ({
   return (
     <>
       <div className="range-slider">
-        <Nouislider
-          start={rangeValue}
-          ref={sliderRef}
-          connect={isPricingRange ? true : [true, false]}
-          range={{
-            min: [min],
-            max: max,
-          }}
-          tooltips={true}
-          pips={{
-            mode: "values",
-            values: rangeArray || [],
-            density: 4,
-          }}
-          onUpdate={onUpdate}
-        />
+        {rangeArray?.length > 0 && (
+           <Nouislider
+            start={rangeValue}
+            connect={[true, false]}
+            ref={sliderRef}
+            range={{
+              min: [min],
+              max: max,
+            }}
+            tooltips={true}
+            behaviour={"smooth-steps-tap"}
+            pips={{
+              mode: "values",
+              values: rangeArray || [],
+              density: 4,
+            }}
+            onSet={onUpdate}
+          />
+        )}
       </div>
     </>
   );

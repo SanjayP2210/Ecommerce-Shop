@@ -166,8 +166,7 @@ const MasterForm = () => {
     <>
       <Loader visible={isLoading} />
       <div className="row common-form">
-        <div className="col-md-3"></div>
-        <div className="col-md-5">
+        <div className="center-item">
           <div className="mt-5">
             <div className="card">
               <div className="card-body">

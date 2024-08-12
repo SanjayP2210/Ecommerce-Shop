@@ -1,15 +1,17 @@
 import { toast } from "react-toastify";
-import apiService from "../../service/apiService";
-import { useState, useEffect } from "react";
+import apiService from "../../../service/apiService.js";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import DropzoneComponent from "../../components/DropZone/DropZone";
-import Repeator from "../../components/Repeator/Repeator";
-import Select2 from "../../components/Select2/Select2";
-import Editor from "../../components/Editor/BootsrapEditor";
-import Loader from "../../components/Loader/Loader";
-import ReactEditor from "../../components/Editor/TextEditor";
-import ReviewCard from "../../components/ReviewCard/ReviewCard";
-import { handleNumberValidation } from "../../constants/utilities.js";
+import DropzoneComponent from "../../../components/DropZone/DropZone.jsx";
+import Repeator from "../../../components/Repeator/Repeator.jsx";
+import Select2 from "../../../components/Select2/Select2.jsx";
+import Editor from "../../../components/Editor/BootsrapEditor.jsx";
+import Loader from "../../../components/Loader/Loader.jsx";
+import ReactEditor from "../../../components/Editor/TextEditor.jsx";
+import ReviewCard from "../../../components/ReviewCard/ReviewCard.jsx";
+import { handleNumberValidation } from "../../../constants/utilities.js";
+import { RangeSlider } from "../../../components/RangeSlider/RangeSlider.jsx";
+import AddVariants from "../../AddVariants.jsx";
 
 const EditProduct = () => {
    const { id } = useParams();
@@ -28,12 +30,16 @@ const EditProduct = () => {
     thumbnail: [],
     images: [],
     stock: 0,
-    numOfReviews:0,
-    ratings:0,
-    reviews:[],
+    numOfReviews: 0,
+    ratings: 0,
+    reviews: [],
+    discountType: "no_discount",
+    discountValue:0
   });
   const [isLoading, setIsLoading] = useState(false);
   const [description, setDescription] = useState("");
+  const [rangeValue, setRangeValue] = useState([50]);
+  const rangeRef = useRef(null);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [uploadedThumbnails, setUploadedThumbnails] = useState([]);
   const [variantData, setVariantData] = useState([]);
@@ -51,7 +57,7 @@ const EditProduct = () => {
        setUploadedImages(productData?.images);
        setUploadedThumbnails(productData?.thumbnail);
        const variants = productData?.variants?.map((x) => {
-         return { ...x, id: x._id };
+         return { ...x, id: x._id, label : x.label };
        });
        console.log("variants", variants);
        setVariantData(variants);
@@ -66,7 +72,6 @@ const EditProduct = () => {
    }, [id]);
 
   const handleInput = (e) => {
-    e.preventDefault();
     const name = e.target.name;
     const value = e.target.value;
     setData({
@@ -84,7 +89,7 @@ const EditProduct = () => {
        images: uploadedImages,
        thumbnail: uploadedThumbnails,
        variants: data?.variants?.map(({ id, ...rest }) => {
-         return { value: rest.variantValue, label: rest.variantType?.value };
+         return { value: rest.value, label: rest.label };
        }),
      };
      const formData = new FormData();
@@ -224,7 +229,11 @@ const EditProduct = () => {
                   <h4 className="card-title mb-7">Variation</h4>
 
                   <label className="form-label">Add Product Variations</label>
-                  <Repeator setData={setVariantData} data={variantData || []} />
+                  {/* <Repeator setData={setVariantData} data={variantData || []} /> */}
+                  <AddVariants
+                    setData={setVariantData}
+                    data={variantData || []}
+                  />
                 </div>
               </div>
               <div className="card">
@@ -247,7 +256,6 @@ const EditProduct = () => {
                             handleInput(e);
                           }}
                         />
-                        <p className="fs-2">Set the product price.</p>
                       </div>
                       <div className="col-md-4">
                         <label className="form-label">
@@ -358,14 +366,17 @@ const EditProduct = () => {
                                 Set Discount Percentage{" "}
                                 <span className="text-danger">*</span>
                               </label>
-                              <input
-                                type="range"
-                                className="form-range"
-                                id="customRange1"
-                                min="0"
-                                max="100"
-                                step="10"
-                              />
+                              <div style={{ marging: "30px 10px" }}>
+                                <RangeSlider
+                                  rangeRef={rangeRef}
+                                  rangeValue={rangeValue}
+                                  setRangeValue={setRangeValue}
+                                  id={"rangeValue"}
+                                  min={0}
+                                  max={100}
+                                />
+                              </div>
+                              <br />
                               <p className="fs-2">
                                 Set a percentage discount to be applied on this
                                 product.

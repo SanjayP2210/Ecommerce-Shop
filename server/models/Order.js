@@ -2,7 +2,7 @@ import moment from 'moment-timezone';
 import mongoose, { model, Schema } from 'mongoose';
 
 const orderSchema = new Schema({
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: Schema.Types.ObjectId, ref:'user', required: true },
     items: [
         {
             product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -24,12 +24,12 @@ const orderSchema = new Schema({
     },
     createdBy: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref:'user',
         required: true 
     },
     modifiedBy: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref:'user',
         required: true
     },
     modifiedAt: {

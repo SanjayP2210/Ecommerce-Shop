@@ -2,12 +2,6 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
 import UserProfile from "../pages/profile/UserProfile";
-import ProductList from "../pages/Ecommerce/ProductList";
-import Shop from "../pages/Ecommerce/Shop";
-import ProductDetails from "../pages/Ecommerce/ProductDetails.jsx";
-import AddProduct from "../pages/Ecommerce/AddProduct";
-import EditProduct from "../pages/Ecommerce/EditProduct";
-import CheckoutProduct from "../pages/Ecommerce/CheckoutProduct";
 import ForgetPassword from "../pages/Auth/ForgetPassword.jsx";
 import ResetPassword from "../pages/ResetPassword.jsx";
 import Login from "../pages/Auth/Login.jsx";
@@ -17,6 +11,13 @@ import OwlCarouselComponent from "../components/OwlCarousel/OwlCarousel.jsx";
 import RatingComponent from "../components/Rating/RatingComponent.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
 import { RangeSlider } from "../components/RangeSlider/RangeSlider.jsx";
+import AddCategory from "../pages/AddCategory.jsx";
+import Shop from '../pages/Ecommerce/Shop/Shop.jsx';
+import ProductList from '../pages/Ecommerce/ProductList/ProductList.jsx';
+import ProductDetails from '../pages/Ecommerce/ProductDetails/ProductDetails.jsx';
+import AddProduct from "../pages/Ecommerce/Master/AddProduct.jsx";
+import EditProduct from "../pages/Ecommerce/Master/EditProduct.jsx";
+import CheckoutProduct from '../pages/Ecommerce/Checkout/CheckoutProduct.jsx';
 
 const AppRouter = () => {
   return (
@@ -30,6 +31,7 @@ const AppRouter = () => {
         <Route path="/" element={<PrivateRoute />}>
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/" element={<Shop />} />
+          <Route path="master/category" element={<AddCategory />} />
           <Route path="master/:componentName" element={<MasterForm />} />
           <Route path="eccommerce">
             <Route path="product-list" element={<ProductList />} />
@@ -39,7 +41,8 @@ const AppRouter = () => {
               element={<ProductDetails />}
             />
             <Route path="add-product" element={<AddProduct />} />
-            <Route path="edit-product/:id" element={<EditProduct />} />
+            <Route path="edit-product/:id" element={<AddProduct />} />
+            <Route path="edit-product-old/:id" element={<EditProduct />} />
             <Route path="checkout-product" element={<CheckoutProduct />} />
           </Route>
           <Route path="component">

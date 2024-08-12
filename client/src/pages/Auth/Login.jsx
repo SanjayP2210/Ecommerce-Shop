@@ -92,10 +92,12 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       console.log("data", data);
-      const { mobileNumber } = data;
       if (!isLoginFlow && image?.length === 0) {
         toast.error("upload profile picture");
         return;
+      } else {
+        delete data.name;
+        delete data.mobileNumber;
       }
       const formData = new FormData();
       const formKeys = Object.keys(data);
@@ -227,6 +229,7 @@ const Login = () => {
                                         onChange={(e) => {
                                           e = handleNumberValidation(e);
                                         }}
+                                        maxLength={10}
                                       />
                                     </div>
                                   </>

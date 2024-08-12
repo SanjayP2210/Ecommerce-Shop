@@ -1,6 +1,5 @@
 $(function () {
   // product detail
-
   var sync1 = $("#sync1");
   var sync2 = $("#sync2");
   var slidesPerPage = 4;
@@ -22,7 +21,6 @@ $(function () {
       ],
     })
 
-    
     .on("changed.owl.carousel", syncPosition);
 
   sync2

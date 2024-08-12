@@ -1,24 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
-import apiService from "../../service/apiService";
+import apiService from "../../../service/apiService";
 import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import _, { debounce } from "lodash";
-import upArrow from "../../assets/images/svgs/up-arrow.svg";
-import downArrow from "../../assets/images/svgs/down-arrow.svg";
-import Loader from "../../components/Loader/Loader";
+import upArrow from "../../../assets/images/svgs/up-arrow.svg";
+import downArrow from "../../../assets/images/svgs/down-arrow.svg";
+import Loader from "../../../components/Loader/Loader";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("productName");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(10);
   const [category, setCategory] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,6 +111,7 @@ const ProductList = () => {
       );
       setProducts(response.products || []);
       setTotalPages(response?.totalPages);
+      setTotalCount(response?.totalCount);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -155,6 +157,7 @@ const ProductList = () => {
     }
     return (
       <img
+        style={{background: 'white',borderRadius: '50%'}}
         src={sortConfig.direction === "asc" ? upArrow : downArrow}
         alt={sortConfig.direction === "asc" ? "up-arrow" : "down-arrow"}
       />
@@ -227,7 +230,7 @@ const ProductList = () => {
                   <i className="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
                 </form>
                 <a
-                  className="fs-6 text-muted"
+                  className="fs-6"
                   href="javascript:void(0)"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
@@ -238,12 +241,13 @@ const ProductList = () => {
               </div>
               <div className="table-responsive border rounded">
                 <table
-                  className="table align-middle text-nowrap mb-0 sortable-table"
+                  style={{ width: "100%" }}
+                  className="table align-middle mb-0 sortable-table"
                   id="sortable-table"
                 >
                   <thead>
                     <tr>
-                      <th scope="col">
+                      {/* <th scope="col" style={{ width: "6%" }}>
                         <div className="form-check">
                           <input
                             className="form-check-input"
@@ -252,28 +256,39 @@ const ProductList = () => {
                             id="flexCheckDefault"
                           />
                         </div>
-                      </th>
+                      </th> */}
                       <th onClick={() => handleSort("productName")}>
                         Products {getSortIcon("productName")}
                       </th>
-                      <th onClick={() => handleSort("createdAt")}>
+                      <th
+                        style={{ width: "15%" }}
+                        onClick={() => handleSort("createdAt")}
+                      >
                         Date {getSortIcon("createdAt")}
                       </th>
-                      <th onClick={() => handleSort("status")}>
+                      <th
+                        style={{ width: "10%" }}
+                        onClick={() => handleSort("status")}
+                      >
                         Status {getSortIcon("status")}
                       </th>
-                      <th onClick={() => handleSort("price")}>
-                        Price {getSortIcon("price")}
+                      <th
+                        style={{ width: "10%" }}
+                        onClick={() => handleSort("updatedPrice")}
+                      >
+                        Price {getSortIcon("updatedPrice")}
                       </th>
-                      <th scope="col">Actions</th>
+                      <th scope="col" style={{ width: "10%" }}>
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {products?.map((prod, index) => {
                       return (
                         <>
-                          <tr>
-                            <td>
+                          <tr key={index}>
+                            {/* <td>
                               <div className="form-check mb-0">
                                 <input
                                   className="form-check-input"
@@ -282,11 +297,11 @@ const ProductList = () => {
                                   id="flexCheckDefault1"
                                 />
                               </div>
-                            </td>
+                            </td> */}
                             <td>
                               <div className="d-flex align-items-center">
                                 <img
-                                  src={prod?.image[0]}
+                                  src={prod?.image?.[0]}
                                   className="rounded-circle"
                                   alt={"thumbnail"}
                                   width="56"
@@ -302,8 +317,8 @@ const ProductList = () => {
                                         <p className="mb-0" key={index1}>
                                           {index1 + 1 !=
                                           prod?.categories?.length
-                                            ? `${categ} ,`
-                                            : categ}
+                                            ? `${categ?.name} ,`
+                                            : categ?.name}
                                         </p>
                                       );
                                     })}
@@ -319,18 +334,24 @@ const ProductList = () => {
                             </td>
                             <td>
                               <div className="d-flex align-items-center">
-                                <span className="text-bg-success p-1 rounded-circle"></span>
-                                <p className="mb-0 ms-2">
-                                  {prod?.status?.value || "Published"}
-                                </p>
+                                {prod?.status?.length > 0 ? (
+                                  <>
+                                    <span className="text-bg-success p-1 rounded-circle"></span>
+                                    <p className="mb-0 ms-2">
+                                      {[prod?.status]?.join()}
+                                    </p>
+                                  </>
+                                ) : "----"}
                               </div>
                             </td>
                             <td>
-                              <h6 className="mb-0 fs-4">{prod?.basePrice}</h6>
+                              <h6 className="mb-0 fs-4">
+                                {prod?.updatedPrice}
+                              </h6>
                             </td>
                             <td>
                               <a
-                                className="fs-6 text-muted"
+                                className="fs-6"
                                 href="javascript:void(0)"
                                 onClick={() => {
                                   navigate(
@@ -341,7 +362,7 @@ const ProductList = () => {
                                 <i className="ti ti-info-circle-filled"></i>
                               </a>
                               <a
-                                className="fs-6 text-muted"
+                                className="fs-6"
                                 href="javascript:void(0)"
                                 style={{ marginLeft: "20px" }}
                                 onClick={() => {
@@ -353,7 +374,7 @@ const ProductList = () => {
                                 <i className="ti ti-edit"></i>
                               </a>
                               <a
-                                className="fs-6 text-muted"
+                                className="fs-6"
                                 href="javascript:void(0)"
                                 style={{ marginLeft: "20px" }}
                                 onClick={() => {
@@ -361,7 +382,6 @@ const ProductList = () => {
                                 }}
                               >
                                 <i className="ti ti-trash"></i>
-                                {/* <i className="ti ti-dots-vertical"></i> */}
                               </a>
                             </td>
                           </tr>
@@ -376,18 +396,19 @@ const ProductList = () => {
                     className="form-select w-auto ms-0 ms-sm-2 me-8 me-sm-4 py-1 pe-7 ps-2 border-0"
                     aria-label="Default select example"
                     onChange={(e) => {
+                      setPage(1);
                       setLimit(e.target.value);
                     }}
                   >
-                    <option selected value="5">
+                    <option value="5">
                       5
                     </option>
-                    <option value="10">10</option>
+                    <option selected value="10">10</option>
                     <option value="25">25</option>
                   </select>
                   <p className="mb-0 fs-2">{`
                     ${page * 1} - ${products?.length}
-                   of ${products?.length}`}</p>
+                   of ${totalCount}`}</p>
                   <nav aria-label="...">
                     <ul className="pagination justify-content-center mb-0 ms-8 ms-sm-9">
                       <li className="page-item p-1">
